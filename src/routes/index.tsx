@@ -1,56 +1,116 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import heroImg from "../assets/hero.jpg";
 
 export const Route = createFileRoute("/")({
   component: BokettoApp,
 });
 
 type Modifier = { id: string; label: string; price: number };
+type Category = "cafeteria" | "reposteria" | "brunch";
 type Product = {
   id: string;
   name: string;
+  origin: string;
   desc: string;
   price: number;
-  category: "reposteria" | "cafeteria";
-  emoji: string;
+  category: Category;
   modifiers?: Modifier[];
 };
 
+const CATS: { id: Category; label: string; sub: string }[] = [
+  { id: "cafeteria", label: "Cafetería", sub: "de especialidad" },
+  { id: "reposteria", label: "Boulangerie", sub: "de autor" },
+  { id: "brunch", label: "Brunch", sub: "fermentación lenta" },
+];
+
 const INITIAL_PRODUCTS: Product[] = [
   {
+    id: "flat-white",
+    name: "Flat White",
+    origin: "Etiopía Sidamo",
+    desc: "Doble shot ristretto sobre leche emulsionada sedosa de una sola pasada. Textura microespuma.",
+    price: 3.2,
+    category: "cafeteria",
+    modifiers: [{ id: "oat", label: "Leche de avena barista", price: 0.4 }],
+  },
+  {
+    id: "v60",
+    name: "V60 Origami",
+    origin: "Etiopía Guji · lavado",
+    desc: "Filtrado artesanal en cerámica, 15g / 250ml. Notas florales, cítricas y té negro al final.",
+    price: 4.5,
+    category: "cafeteria",
+  },
+  {
+    id: "iced-v60",
+    name: "Iced V60",
+    origin: "Colombia Huila · natural",
+    desc: "Filtrado sobre hielo. Cuerpo limpio, acidez balanceada, retrogusto a frutos rojos.",
+    price: 4.8,
+    category: "cafeteria",
+  },
+  {
+    id: "matcha",
+    name: "Green Flag Matcha",
+    origin: "Uji, Kioto",
+    desc: "Matcha ceremonial batido a mano. Notas vegetales, umami largo, sin dulzor añadido.",
+    price: 3.8,
+    category: "cafeteria",
+    modifiers: [{ id: "oat", label: "Leche de avena barista", price: 0.4 }],
+  },
+  {
     id: "pistacho-rosas",
-    name: "Bizcocho de Pistacho con Agua de Rosas",
-    desc: "Bizcocho húmedo de pistacho siciliano, perfumado con agua de rosas de Damasco.",
+    name: "Bizcocho de Pistacho",
+    origin: "Con agua de rosas de Damasco",
+    desc: "Bizcocho húmedo de pistacho siciliano, perfumado con agua de rosas. Glaseado mate.",
     price: 4.5,
     category: "reposteria",
-    emoji: "🌸",
-    modifiers: [{ id: "crujiente", label: "Extra de Pistacho Crujiente", price: 0.5 }],
+    modifiers: [{ id: "crunch", label: "Extra crujiente de pistacho", price: 0.5 }],
   },
   {
     id: "brioche-pistacho",
-    name: "Brioche Relleno de Crema de Pistacho",
-    desc: "Fermentación lenta 24h con masa madre. Relleno cremoso al momento.",
+    name: "Brioche de Pistacho",
+    origin: "Fermentación 24h · masa madre",
+    desc: "Brioche laminado relleno al momento de crema de pistacho. Servir templado.",
     price: 3.9,
     category: "reposteria",
-    emoji: "🥐",
   },
   {
-    id: "green-flag-matcha",
-    name: "Green Flag Matcha Latte",
-    desc: "Matcha ceremonial japonés batido a mano. Notas vegetales y umami.",
-    price: 3.8,
-    category: "cafeteria",
-    emoji: "🍵",
-    modifiers: [{ id: "avena", label: "Leche de Avena Barista", price: 0.4 }],
-  },
-  {
-    id: "flat-white",
-    name: "Flat White de Especialidad",
-    desc: "Doble ristretto sobre leche texturizada. Grano de origen único.",
+    id: "croissant",
+    name: "Croissant de Mantequilla",
+    origin: "Beurre AOP Charentes",
+    desc: "Laminado a tres vueltas, 72 capas. Corteza fina, miga aireada, aroma a mantequilla noisette.",
     price: 2.8,
-    category: "cafeteria",
-    emoji: "☕",
-    modifiers: [{ id: "avena2", label: "Leche de Avena Barista", price: 0.4 }],
+    category: "reposteria",
+  },
+  {
+    id: "pain-choc",
+    name: "Pain au Chocolat",
+    origin: "Chocolate Valrhona 70%",
+    desc: "Dos barras de chocolate negro dentro de masa laminada. Crujiente por fuera, tierno dentro.",
+    price: 3.5,
+    category: "reposteria",
+  },
+  {
+    id: "tostada",
+    name: "Tostada de Aguacate",
+    origin: "Pan de masa madre 48h",
+    desc: "Aguacate, aceite de oliva virgen extra picual, ralladura de limón, escamas de sal.",
+    price: 8.5,
+    category: "brunch",
+    modifiers: [
+      { id: "egg", label: "Huevo poché", price: 1.5 },
+      { id: "salmon", label: "Salmón noruego marinado", price: 3.5 },
+    ],
+  },
+  {
+    id: "granola",
+    name: "Granola de la Casa",
+    origin: "Con yogur griego colado",
+    desc: "Avena tostada con miel de azahar, frutos secos, semillas y frutas de temporada.",
+    price: 6.9,
+    category: "brunch",
   },
 ];
 
@@ -72,138 +132,173 @@ function BokettoApp() {
   const totals = useMemo(() => calcTotals(basket, products), [basket, products]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-28 transition-colors">
-      {view === "home" && <HomeView onEnter={() => setView("carta")} />}
-      {view === "carta" && (
-        <CartaView
-          products={products}
-          soldOut={soldOut}
-          basket={basket}
-          setBasket={setBasket}
-          onConfirm={() => {
-            setConfirmed(basket);
-            setView("estado");
-          }}
-          totals={totals}
-        />
-      )}
-      {view === "estado" && (
-        <EstadoView
-          lines={confirmed ?? basket}
-          products={products}
-          onBack={() => setView("carta")}
-          onNew={() => {
-            setBasket([]);
-            setConfirmed(null);
-            setView("carta");
-          }}
-        />
-      )}
-      {view === "admin" && (
-        <AdminView
-          products={products}
-          setProducts={setProducts}
-          soldOut={soldOut}
-          setSoldOut={setSoldOut}
-          dark={dark}
-          setDark={setDark}
-        />
-      )}
+    <div className="min-h-screen bg-background text-foreground pb-32 transition-colors">
+      <div key={view} className="animate-rise">
+        {view === "home" && <HomeView onEnter={() => setView("carta")} />}
+        {view === "carta" && (
+          <CartaView
+            products={products}
+            soldOut={soldOut}
+            basket={basket}
+            setBasket={setBasket}
+            onConfirm={() => {
+              setConfirmed(basket);
+              setView("estado");
+            }}
+            totals={totals}
+          />
+        )}
+        {view === "estado" && (
+          <EstadoView
+            lines={confirmed ?? basket}
+            products={products}
+            onBack={() => setView("carta")}
+            onNew={() => {
+              setBasket([]);
+              setConfirmed(null);
+              setView("carta");
+            }}
+          />
+        )}
+        {view === "admin" && (
+          <AdminView
+            products={products}
+            setProducts={setProducts}
+            soldOut={soldOut}
+            setSoldOut={setSoldOut}
+            dark={dark}
+            setDark={setDark}
+          />
+        )}
+      </div>
       <BottomNav view={view} setView={setView} />
     </div>
   );
 }
 
-/* ------------------------------- HOME ---------------------------------- */
+/* ============================ HOME =================================== */
 function HomeView({ onEnter }: { onEnter: () => void }) {
   return (
     <div>
-      <section className="bg-[var(--forest)] text-[color:var(--primary-foreground)] px-6 pt-14 pb-16 rounded-b-[2rem] relative overflow-hidden">
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-[11px] tracking-[0.4em] text-[var(--gold)] uppercase mb-4">
-            Since 2021 · València
-          </p>
-          <h1 className="font-extrabold tracking-[0.25em] text-4xl sm:text-6xl leading-none">
-            BOKETTO
-          </h1>
-          <p className="mt-4 text-sm sm:text-base opacity-90">
-            Pastelería de Autor & Café de Especialidad
-          </p>
-          <p className="font-serif text-2xl sm:text-3xl mt-8 text-[var(--gold)]">
-            "Mirar a la nada y que te sepa a Boketto"
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-2">
-            <Badge>⭐ 5,0 en Google · no lo decimos nosotros</Badge>
-            <Badge>📍 Calle de Guillem Sorolla 29, València</Badge>
+      {/* Cinematic hero */}
+      <section className="relative h-[92svh] min-h-[560px] w-full overflow-hidden">
+        <img
+          src={heroImg}
+          alt="Boketto — interior al atardecer"
+          width={1280}
+          height={1600}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[color:var(--forest)]/40 via-[color:var(--forest)]/20 to-[color:var(--forest)]" />
+        <div className="absolute inset-0 flex flex-col justify-between px-6 sm:px-10 py-10 sm:py-14 max-w-6xl mx-auto text-[color:var(--primary-foreground)]">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
+              Est · 2021
+            </span>
+            <span className="text-[10px] tracking-editorial uppercase opacity-80">
+              València · ES
+            </span>
           </div>
-          <button
-            onClick={onEnter}
-            className="mt-10 inline-flex items-center gap-2 bg-[var(--gold)] text-[var(--forest)] font-semibold px-6 py-3 rounded-full hover:scale-[1.03] active:scale-95 transition-transform"
-          >
-            Ver la carta →
-          </button>
+
+          <div className="animate-rise-slow max-w-2xl">
+            <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)] mb-4">
+              Specialty Coffee & Pastry
+            </p>
+            <h1 className="font-serif italic text-6xl sm:text-8xl leading-[0.9]">
+              Boketto
+            </h1>
+            <div className="hairline w-24 my-6" />
+            <p className="font-serif italic text-xl sm:text-2xl max-w-lg leading-snug opacity-95">
+              "Mirar a la nada y que te sepa a Boketto."
+            </p>
+            <div className="mt-10 flex flex-wrap items-center gap-3">
+              <button
+                onClick={onEnter}
+                className="group inline-flex items-center gap-3 bg-[color:var(--gold)] text-[color:var(--forest)] rounded-full pl-6 pr-3 py-3 text-[10px] tracking-editorial uppercase font-medium hover:bg-[color:var(--primary-foreground)] transition-colors"
+              >
+                Explorar la carta
+                <span className="grid place-items-center w-8 h-8 rounded-full bg-[color:var(--forest)] text-[color:var(--gold)] transition-transform group-hover:translate-x-0.5">
+                  →
+                </span>
+              </button>
+              <a
+                href="https://wa.me/34614191802?text=Hola%20Boketto%2C%20quiero%20reservar%20mesa"
+                target="_blank"
+                rel="noreferrer"
+                className="text-[10px] tracking-editorial uppercase border-b border-[color:var(--gold)]/60 pb-1 hover:border-[color:var(--gold)]"
+              >
+                Reservar mesa →
+              </a>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="max-w-3xl mx-auto px-6 mt-12 grid sm:grid-cols-2 gap-4">
+      {/* Manifiesto */}
+      <section className="max-w-3xl mx-auto px-6 sm:px-10 pt-24 pb-16 text-center">
+        <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)] mb-6">
+          Manifiesto
+        </p>
+        <p className="font-serif italic text-3xl sm:text-4xl leading-tight">
+          Pastelería pensada como un pequeño ensayo comestible.
+          Café tratado como materia viva.
+        </p>
+        <div className="hairline w-16 mx-auto mt-10" />
+      </section>
+
+      {/* Two-pillar editorial split */}
+      <section className="max-w-5xl mx-auto px-6 sm:px-10 pb-20 grid md:grid-cols-2 gap-px bg-border">
         <Pillar
-          title="Pastelería de autor"
-          body="Texturas crujientes y sabores equilibrados. Cada pieza pensada como un pequeño ensayo comestible."
-          icon="🥐"
+          eyebrow="01 — Café"
+          title="De especialidad, taza a taza"
+          body="Granos de origen único, tostados lentamente. Extracción calibrada cada mañana. Ristrettos densos, filtrados limpios, matchas ceremoniales."
         />
         <Pillar
-          title="Café de especialidad"
-          body="Granos seleccionados y tostados lentamente. Extracciones cuidadas taza a taza."
-          icon="☕"
+          eyebrow="02 — Pastelería"
+          title="De autor, sin excesos"
+          body="Masas de fermentación larga, mantequilla AOP y azúcares justos. Si el postre empalaga, no es de Boketto."
         />
       </section>
 
-      <section className="max-w-3xl mx-auto px-6 mt-10">
-        <div className="rounded-2xl border border-[var(--gold)]/40 bg-card p-6">
-          <p className="text-[11px] tracking-[0.3em] uppercase text-[var(--gold)]">
+      {/* Reserva */}
+      <section className="max-w-3xl mx-auto px-6 sm:px-10 pb-24">
+        <div className="border border-border rounded-3xl p-10 text-center bg-card">
+          <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)] mb-4">
             Reserva
           </p>
-          <h3 className="font-serif text-2xl mt-1">Reserva tu Mesa</h3>
-          <p className="text-sm text-muted-foreground mt-2">
-            Aforo reducido, servicio pausado. Escríbenos por WhatsApp y te confirmamos al instante.
+          <h3 className="font-serif italic text-3xl">Aforo reducido, servicio pausado.</h3>
+          <p className="text-sm text-muted-foreground mt-4 max-w-md mx-auto leading-relaxed">
+            Guillem Sorolla 29, València. Escríbenos por WhatsApp y confirmamos al instante.
           </p>
           <a
             href="https://wa.me/34614191802?text=Hola%20Boketto%2C%20quiero%20reservar%20mesa"
             target="_blank"
             rel="noreferrer"
-            className="mt-4 inline-flex items-center gap-2 border border-foreground rounded-full px-5 py-2.5 text-sm font-medium hover:bg-foreground hover:text-background transition-colors"
+            className="mt-8 inline-flex items-center gap-2 border border-foreground rounded-full px-6 py-3 text-[10px] tracking-editorial uppercase font-medium hover:bg-foreground hover:text-background transition-colors"
           >
             Reservar por WhatsApp
           </a>
         </div>
       </section>
 
-      <p className="font-serif text-center text-lg text-muted-foreground mt-12 px-6">
-        "Si el postre empalaga, no es de Boketto."
+      <p className="text-[10px] tracking-editorial uppercase text-center text-muted-foreground pb-16">
+        Boketto · Guillem Sorolla 29 · València
       </p>
     </div>
   );
 }
 
-function Badge({ children }: { children: React.ReactNode }) {
+function Pillar({ eyebrow, title, body }: { eyebrow: string; title: string; body: string }) {
   return (
-    <span className="text-xs border border-[var(--gold)]/50 text-[var(--gold)] rounded-full px-3 py-1.5">
-      {children}
-    </span>
-  );
-}
-
-function Pillar({ title, body, icon }: { title: string; body: string; icon: string }) {
-  return (
-    <div className="rounded-2xl bg-card p-6 border border-border hover:border-[var(--gold)] transition-colors">
-      <div className="text-2xl">{icon}</div>
-      <h3 className="mt-3 font-semibold text-lg">{title}</h3>
-      <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{body}</p>
+    <div className="bg-background p-10">
+      <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">{eyebrow}</p>
+      <h3 className="font-serif italic text-3xl mt-4">{title}</h3>
+      <p className="text-sm text-muted-foreground mt-4 leading-relaxed">{body}</p>
     </div>
   );
 }
 
-/* ------------------------------- CARTA --------------------------------- */
+/* ============================ CARTA ================================== */
 function CartaView({
   products,
   soldOut,
@@ -219,8 +314,8 @@ function CartaView({
   onConfirm: () => void;
   totals: { count: number; total: number };
 }) {
-  const [cat, setCat] = useState<"todo" | "reposteria" | "cafeteria">("todo");
-  const filtered = products.filter((p) => cat === "todo" || p.category === cat);
+  const [cat, setCat] = useState<Category>("cafeteria");
+  const filtered = products.filter((p) => p.category === cat);
 
   const addLine = (productId: string) =>
     setBasket((b) => [...b, { productId, modifiers: {} }]);
@@ -234,123 +329,160 @@ function CartaView({
     );
 
   return (
-    <div className="max-w-3xl mx-auto px-5 pt-8">
-      <p className="text-[11px] tracking-[0.4em] uppercase text-[var(--gold)]">Carta</p>
-      <h2 className="font-serif text-3xl mt-1">Nuestra selección de hoy</h2>
+    <div className="max-w-2xl mx-auto px-6 sm:px-10 pt-14">
+      <header className="text-center">
+        <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
+          La Carta
+        </p>
+        <h2 className="font-serif italic text-5xl mt-3">Selección del día</h2>
+        <div className="hairline w-16 mx-auto mt-6" />
+      </header>
 
-      <div className="flex gap-2 mt-6 overflow-x-auto pb-2">
-        {[
-          { id: "todo", label: "✨ Todo" },
-          { id: "reposteria", label: "🥐 Repostería" },
-          { id: "cafeteria", label: "☕ Cafetería" },
-        ].map((c) => (
-          <button
-            key={c.id}
-            onClick={() => setCat(c.id as typeof cat)}
-            className={`shrink-0 px-4 py-2 rounded-full text-sm border transition-all ${
-              cat === c.id
-                ? "bg-foreground text-background border-foreground"
-                : "bg-card border-border hover:border-[var(--gold)]"
-            }`}
-          >
-            {c.label}
-          </button>
-        ))}
-      </div>
+      {/* Category tabs */}
+      <nav className="sticky top-0 z-30 bg-background/90 backdrop-blur pt-8 pb-4 -mx-6 sm:-mx-10 px-6 sm:px-10 mt-8 border-b border-border">
+        <div className="flex justify-between gap-4">
+          {CATS.map((c) => {
+            const active = cat === c.id;
+            return (
+              <button
+                key={c.id}
+                onClick={() => setCat(c.id)}
+                className={`flex-1 text-center pb-2 transition-all ${
+                  active
+                    ? "border-b border-[color:var(--gold)]"
+                    : "border-b border-transparent opacity-40 hover:opacity-70"
+                }`}
+              >
+                <p className={`text-[10px] tracking-editorial uppercase font-medium`}>
+                  {c.label}
+                </p>
+                <p className="font-serif italic text-xs opacity-70 mt-0.5">{c.sub}</p>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
 
-      <div className="grid sm:grid-cols-2 gap-4 mt-6">
-        {filtered.map((p) => {
+      {/* Menu list */}
+      <div className="mt-10 space-y-10 animate-rise">
+        {filtered.map((p, i) => {
           const out = soldOut[p.id];
           const linesForProduct = basket
-            .map((l, i) => ({ l, i }))
+            .map((l, i2) => ({ l, i: i2 }))
             .filter((x) => x.l.productId === p.id);
+          const count = linesForProduct.length;
           return (
-            <div
+            <article
               key={p.id}
-              className={`rounded-2xl bg-card border border-border p-5 flex flex-col transition-all ${
-                out ? "opacity-40 blur-[1.5px] pointer-events-none select-none" : ""
+              className={`group transition-all ${
+                out ? "opacity-30 blur-[1.5px] pointer-events-none select-none" : ""
               }`}
             >
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex justify-between items-baseline gap-6">
                 <div className="min-w-0">
-                  <div className="text-2xl">{p.emoji}</div>
-                  <h3 className="font-semibold mt-2 leading-tight">{p.name}</h3>
-                  <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                    {p.desc}
+                  <h3 className="font-serif text-2xl leading-tight">{p.name}</h3>
+                  <p className="font-serif italic text-xs text-[color:var(--gold)] mt-1">
+                    {p.origin}
                   </p>
                 </div>
-                <span className="shrink-0 text-sm font-semibold border border-[var(--gold)]/50 text-[var(--gold)] rounded-full px-2.5 py-1">
-                  €{p.price.toFixed(2)}
+                <span className="shrink-0 text-sm tracking-wider tabular-nums text-muted-foreground">
+                  {p.price.toFixed(2)} €
                 </span>
               </div>
+              <p className="text-[12px] leading-relaxed text-muted-foreground mt-3 max-w-md">
+                {p.desc}
+              </p>
 
               {out ? (
-                <p className="mt-4 text-xs uppercase tracking-widest text-destructive">
-                  Agotado
+                <p className="mt-4 text-[10px] tracking-editorial uppercase text-destructive">
+                  Agotado hoy
                 </p>
               ) : (
                 <>
-                  {linesForProduct.length > 0 && p.modifiers && (
+                  {count > 0 && p.modifiers && p.modifiers.length > 0 && (
                     <div className="mt-4 space-y-2">
-                      {linesForProduct.map(({ l, i }) => (
-                        <div key={i} className="rounded-lg bg-muted/60 p-3 space-y-1.5">
-                          <p className="text-[11px] text-muted-foreground">
-                            Unidad #{linesForProduct.findIndex((x) => x.i === i) + 1}
+                      {linesForProduct.map(({ l, i: lineIdx }, n) => (
+                        <div
+                          key={lineIdx}
+                          className="border-l border-[color:var(--gold)]/40 pl-4 py-1 space-y-1.5"
+                        >
+                          <p className="text-[10px] tracking-editorial uppercase text-muted-foreground">
+                            Unidad {n + 1}
                           </p>
                           {p.modifiers!.map((m) => (
                             <label
                               key={m.id}
-                              className="flex items-center justify-between gap-2 text-xs cursor-pointer"
+                              className="flex items-center justify-between gap-3 text-xs cursor-pointer group/mod"
                             >
                               <span className="flex items-center gap-2">
                                 <input
                                   type="checkbox"
                                   checked={!!l.modifiers[m.id]}
-                                  onChange={() => toggleMod(i, m.id)}
-                                  className="accent-[var(--forest)]"
+                                  onChange={() => toggleMod(lineIdx, m.id)}
+                                  className="accent-[color:var(--forest)]"
                                 />
-                                {m.label}
+                                <span className="font-serif italic">{m.label}</span>
                               </span>
-                              <span className="text-[var(--gold)]">+€{m.price.toFixed(2)}</span>
+                              <span className="text-[color:var(--gold)] tabular-nums">
+                                +{m.price.toFixed(2)} €
+                              </span>
                             </label>
                           ))}
                           <button
-                            onClick={() => removeLine(i)}
-                            className="text-[10px] uppercase tracking-widest text-destructive hover:underline"
+                            onClick={() => removeLine(lineIdx)}
+                            className="text-[9px] tracking-editorial uppercase text-destructive hover:underline"
                           >
-                            Quitar unidad
+                            Quitar
                           </button>
                         </div>
                       ))}
                     </div>
                   )}
-                  <button
-                    onClick={() => addLine(p.id)}
-                    className="mt-4 self-start bg-[var(--forest)] text-[color:var(--primary-foreground)] text-sm font-medium rounded-full px-4 py-2 hover:scale-[1.03] active:scale-95 transition-transform"
-                  >
-                    + Añadir
-                  </button>
+
+                  <div className="mt-5 flex items-center gap-4">
+                    <button
+                      onClick={() => addLine(p.id)}
+                      className="inline-flex items-center gap-3 border border-foreground rounded-full pl-4 pr-2 py-1.5 text-[10px] tracking-editorial uppercase hover:bg-foreground hover:text-background transition-colors"
+                    >
+                      Añadir
+                      <span className="grid place-items-center w-6 h-6 rounded-full border border-current">
+                        +
+                      </span>
+                    </button>
+                    {count > 0 && (
+                      <span className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
+                        × {count} en el pedido
+                      </span>
+                    )}
+                  </div>
                 </>
               )}
-            </div>
+
+              {i < filtered.length - 1 && <div className="hairline w-full mt-10 opacity-40" />}
+            </article>
           );
         })}
       </div>
 
+      {/* Sticky order bar */}
       {totals.count > 0 && (
-        <div className="fixed left-0 right-0 bottom-20 z-40 px-4">
-          <div className="max-w-3xl mx-auto bg-[var(--forest)] text-[color:var(--primary-foreground)] rounded-2xl px-5 py-4 flex items-center justify-between shadow-2xl">
-            <div>
-              <p className="text-[10px] uppercase tracking-widest text-[var(--gold)]">
-                {totals.count} {totals.count === 1 ? "unidad" : "unidades"}
-              </p>
-              <p className="text-lg font-semibold">€{totals.total.toFixed(2)}</p>
-            </div>
+        <div className="fixed left-0 right-0 bottom-24 z-40 px-4 pointer-events-none">
+          <div className="max-w-2xl mx-auto pointer-events-auto animate-rise">
             <button
               onClick={onConfirm}
-              className="bg-[var(--gold)] text-[var(--forest)] font-semibold rounded-full px-5 py-2.5 hover:scale-[1.03] active:scale-95 transition-transform"
+              className="w-full bg-[color:var(--forest)] text-[color:var(--primary-foreground)] rounded-full pl-6 pr-2 py-2 flex items-center justify-between shadow-2xl hover:scale-[1.01] active:scale-[0.99] transition-transform"
             >
-              Confirmar Pedido Directo →
+              <div className="text-left">
+                <p className="text-[9px] tracking-editorial uppercase text-[color:var(--gold)]">
+                  {totals.count} {totals.count === 1 ? "unidad" : "unidades"} · Pedido directo
+                </p>
+                <p className="font-serif italic text-lg leading-tight">
+                  Confirmar · {totals.total.toFixed(2)} €
+                </p>
+              </div>
+              <span className="grid place-items-center w-12 h-12 rounded-full bg-[color:var(--gold)] text-[color:var(--forest)]">
+                →
+              </span>
             </button>
           </div>
         </div>
@@ -359,7 +491,7 @@ function CartaView({
   );
 }
 
-/* ------------------------------- ESTADO -------------------------------- */
+/* ============================ ESTADO ================================= */
 function EstadoView({
   lines,
   products,
@@ -373,92 +505,138 @@ function EstadoView({
 }) {
   const detail = useMemo(() => buildLineDetail(lines, products), [lines, products]);
   const total = detail.reduce((s, l) => s + l.total, 0);
+  const orderId = useMemo(
+    () => "BKT-" + Math.floor(100 + Math.random() * 900),
+    [],
+  );
 
   const waMessage = useMemo(() => {
-    const header = `*🥐 NUEVO PEDIDO — BOKETTO*\n_Calle de Guillem Sorolla 29, València_\n\n`;
+    const header = `*BOKETTO — NUEVO PEDIDO*\n_Guillem Sorolla 29, València_\nRef: ${orderId}\n\n`;
     const body = detail
       .map(
         (l) =>
-          `• *${l.name}*  —  €${l.base.toFixed(2)}\n` +
-          l.mods.map((m) => `   ↳ ${m.label} (+€${m.price.toFixed(2)})`).join("\n"),
+          `• *${l.name}* — ${l.base.toFixed(2)} €\n` +
+          l.mods.map((m) => `   ↳ ${m.label} (+${m.price.toFixed(2)} €)`).join("\n"),
       )
       .join("\n\n");
-    const footer = `\n\n---\n*TOTAL:* €${total.toFixed(2)}\n_0% comisiones · directo a la barra ☕_`;
+    const footer = `\n\n———\n*TOTAL:* ${total.toFixed(2)} €\n_0% comisiones · directo a la barra_`;
     return header + body + footer;
-  }, [detail, total]);
+  }, [detail, total, orderId]);
 
   const waUrl = `https://wa.me/34614191802?text=${encodeURIComponent(waMessage)}`;
 
   if (lines.length === 0) {
     return (
-      <div className="max-w-md mx-auto px-6 pt-24 text-center">
-        <p className="font-serif text-2xl">Aún no hay ticket</p>
-        <p className="text-sm text-muted-foreground mt-2">
-          Añade productos desde la carta para generar tu recibo.
+      <div className="max-w-md mx-auto px-6 pt-32 text-center animate-rise">
+        <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
+          Ticket
+        </p>
+        <h2 className="font-serif italic text-4xl mt-3">Aún sin pedido</h2>
+        <p className="text-sm text-muted-foreground mt-4">
+          Añade productos desde la carta para generar tu recibo digital.
         </p>
         <button
           onClick={onBack}
-          className="mt-6 bg-foreground text-background rounded-full px-5 py-2.5 text-sm"
+          className="mt-8 inline-flex items-center gap-3 border border-foreground rounded-full pl-5 pr-2 py-2 text-[10px] tracking-editorial uppercase hover:bg-foreground hover:text-background transition-colors"
         >
           Ir a la carta
+          <span className="grid place-items-center w-7 h-7 rounded-full bg-foreground text-background">
+            →
+          </span>
         </button>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto px-5 pt-8">
-      <p className="text-[11px] tracking-[0.4em] uppercase text-[var(--gold)]">Ticket</p>
-      <h2 className="font-serif text-3xl mt-1">Tu recibo Boketto</h2>
-
-      <div className="mt-6 bg-[#faf6ec] text-[#1c221f] rounded-md p-6 ticket-shadow font-mono text-[13px] leading-relaxed">
-        <div className="text-center border-b border-dashed border-[#c2b29d] pb-3 mb-3">
-          <p className="font-bold tracking-[0.3em]">BOKETTO</p>
-          <p className="text-[10px]">Guillem Sorolla 29 · València</p>
-          <p className="text-[10px]">— pre-cuenta —</p>
-        </div>
-        {detail.map((l, i) => (
-          <div key={i} className="mb-2">
-            <div className="flex justify-between">
-              <span className="pr-2">{l.name}</span>
-              <span>€{l.base.toFixed(2)}</span>
-            </div>
-            {l.mods.map((m, mi) => (
-              <div key={mi} className="flex justify-between text-[11px] pl-4 opacity-80">
-                <span>+ {m.label}</span>
-                <span>€{m.price.toFixed(2)}</span>
-              </div>
-            ))}
-          </div>
-        ))}
-        <div className="border-t border-dashed border-[#c2b29d] mt-3 pt-3 flex justify-between font-bold">
-          <span>TOTAL</span>
-          <span>€{total.toFixed(2)}</span>
-        </div>
-        <p className="text-center text-[10px] mt-4 opacity-70">
-          — gracias por elegir slow food —
+    <div className="max-w-md mx-auto px-6 pt-14">
+      <header className="text-center">
+        <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
+          Ticket digital
         </p>
+        <h2 className="font-serif italic text-4xl mt-3">Tu recibo Boketto</h2>
+        <div className="hairline w-16 mx-auto mt-6" />
+      </header>
+
+      {/* Editorial dark ticket */}
+      <div className="mt-10 bg-[color:var(--forest)] text-[color:var(--primary-foreground)] rounded-3xl p-8 ticket-shadow">
+        <div className="flex justify-between items-start mb-8">
+          <div>
+            <p className="text-[9px] tracking-editorial uppercase text-[color:var(--gold)] mb-1">
+              Ticket activo
+            </p>
+            <h3 className="font-serif italic text-3xl leading-none">Boketto</h3>
+            <p className="text-[10px] opacity-60 mt-2">Guillem Sorolla 29 · València</p>
+          </div>
+          <div className="text-right">
+            <p className="text-[9px] tracking-editorial uppercase opacity-60">Orden</p>
+            <p className="font-serif text-xl mt-1">#{orderId}</p>
+          </div>
+        </div>
+
+        <div className="space-y-4 border-y border-white/10 py-6">
+          {detail.map((l, i) => (
+            <div key={i}>
+              <div className="flex justify-between items-baseline">
+                <span className="font-serif italic text-lg pr-2 leading-tight">
+                  1× {l.name}
+                </span>
+                <span className="text-xs tabular-nums opacity-90">
+                  {l.base.toFixed(2)} €
+                </span>
+              </div>
+              {l.mods.map((m, mi) => (
+                <div
+                  key={mi}
+                  className="flex justify-between text-[11px] pl-4 mt-1 opacity-70"
+                >
+                  <span>↳ {m.label}</span>
+                  <span className="tabular-nums">+{m.price.toFixed(2)} €</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-between items-center mt-6">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--gold)] animate-pulse" />
+            <span className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
+              En barra
+            </span>
+          </div>
+          <span className="font-serif italic text-3xl">{total.toFixed(2)} €</span>
+        </div>
       </div>
 
+      {/* WhatsApp CTA */}
       <a
         href={waUrl}
         target="_blank"
         rel="noreferrer"
-        className="mt-6 flex items-center justify-center gap-2 bg-[#25D366] text-white rounded-full py-3.5 font-semibold hover:scale-[1.02] active:scale-95 transition-transform"
+        className="mt-6 flex items-center justify-between w-full bg-foreground text-background rounded-full pl-6 pr-2 py-2 shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-transform"
       >
-        📲 Enviar por WhatsApp
+        <div className="text-left">
+          <p className="text-[9px] tracking-editorial uppercase text-[color:var(--gold)]">
+            Sin comisiones
+          </p>
+          <p className="font-serif italic text-base leading-tight">Enviar por WhatsApp</p>
+        </div>
+        <span className="grid place-items-center w-11 h-11 rounded-full bg-[color:var(--gold)] text-[color:var(--forest)]">
+          →
+        </span>
       </a>
 
-      <div className="mt-3 flex gap-2">
+      <div className="mt-4 grid grid-cols-2 gap-2">
         <button
           onClick={onBack}
-          className="flex-1 border border-border rounded-full py-2.5 text-sm"
+          className="border border-border rounded-full py-3 text-[10px] tracking-editorial uppercase hover:border-foreground transition-colors"
         >
-          ← Editar pedido
+          Editar
         </button>
         <button
           onClick={onNew}
-          className="flex-1 border border-border rounded-full py-2.5 text-sm"
+          className="border border-border rounded-full py-3 text-[10px] tracking-editorial uppercase hover:border-foreground transition-colors"
         >
           Nuevo ticket
         </button>
@@ -467,7 +645,7 @@ function EstadoView({
   );
 }
 
-/* ------------------------------- ADMIN --------------------------------- */
+/* ============================ ADMIN ================================== */
 function AdminView({
   products,
   setProducts,
@@ -484,111 +662,128 @@ function AdminView({
   setDark: (v: boolean) => void;
 }) {
   return (
-    <div className="max-w-3xl mx-auto px-5 pt-8">
-      <p className="text-[11px] tracking-[0.4em] uppercase text-[var(--gold)]">TPV</p>
-      <h2 className="font-serif text-3xl mt-1">Panel de barra</h2>
+    <div className="max-w-2xl mx-auto px-6 sm:px-10 pt-14">
+      <header className="text-center">
+        <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
+          Panel interno
+        </p>
+        <h2 className="font-serif italic text-4xl mt-3">Barra & stock</h2>
+        <div className="hairline w-16 mx-auto mt-6" />
+      </header>
 
-      <div className="mt-6 rounded-2xl bg-card border border-border p-5 flex items-center justify-between">
-        <div>
-          <p className="font-semibold">Modo oscuro del sitio</p>
-          <p className="text-xs text-muted-foreground">
-            Cambia la piel pública instantáneamente.
+      {/* Dark mode toggle */}
+      <div className="mt-10 border border-border rounded-2xl p-6 flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <p className="font-serif italic text-xl">Modo nocturno</p>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            Cambia la piel pública al instante.
           </p>
         </div>
         <button
           onClick={() => setDark(!dark)}
-          className={`relative w-16 h-9 rounded-full transition-colors ${
-            dark ? "bg-[var(--gold)]" : "bg-muted"
+          aria-label="Toggle dark mode"
+          className={`relative shrink-0 w-16 h-8 rounded-full transition-colors ${
+            dark ? "bg-[color:var(--gold)]" : "bg-muted"
           }`}
         >
           <span
-            className={`absolute top-1 left-1 w-7 h-7 rounded-full bg-background border border-border transition-transform ${
-              dark ? "translate-x-7" : ""
+            className={`absolute top-1 left-1 w-6 h-6 rounded-full bg-background border border-border transition-transform ${
+              dark ? "translate-x-8" : ""
             }`}
           />
         </button>
       </div>
 
-      <div className="mt-4 space-y-3">
-        {products.map((p) => (
-          <div
-            key={p.id}
-            className="rounded-2xl bg-card border border-border p-4 grid grid-cols-[minmax(0,1fr)_auto] gap-4 items-center"
-          >
-            <div className="min-w-0">
-              <p className="font-semibold truncate">
-                {p.emoji} {p.name}
-              </p>
-              <div className="mt-2 flex items-center gap-2">
-                <label className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                  €
-                </label>
-                <input
-                  type="number"
-                  step="0.10"
-                  value={p.price}
-                  onChange={(e) =>
-                    setProducts((arr) =>
-                      arr.map((x) =>
-                        x.id === p.id ? { ...x, price: parseFloat(e.target.value) || 0 } : x,
-                      ),
-                    )
-                  }
-                  className="w-24 bg-muted rounded-md px-2 py-1 text-sm border border-border focus:outline-none focus:border-[var(--gold)]"
-                />
-              </div>
-            </div>
-            <button
-              onClick={() => setSoldOut((s) => ({ ...s, [p.id]: !s[p.id] }))}
-              className={`shrink-0 text-xs font-semibold uppercase tracking-widest rounded-full px-4 py-2.5 transition-colors ${
-                soldOut[p.id]
-                  ? "bg-destructive text-destructive-foreground"
-                  : "bg-[var(--forest)] text-[color:var(--primary-foreground)]"
-              }`}
+      {/* Product rows */}
+      <div className="mt-8 space-y-px bg-border rounded-2xl overflow-hidden border border-border">
+        {products.map((p) => {
+          const out = soldOut[p.id];
+          return (
+            <div
+              key={p.id}
+              className="bg-background p-5 grid grid-cols-[minmax(0,1fr)_auto] gap-4 items-center"
             >
-              {soldOut[p.id] ? "Agotado" : "Disponible"}
-            </button>
-          </div>
-        ))}
+              <div className="min-w-0">
+                <p className="font-serif text-lg truncate">{p.name}</p>
+                <p className="font-serif italic text-[11px] text-[color:var(--gold)] truncate">
+                  {p.origin}
+                </p>
+                <div className="mt-3 flex items-center gap-2">
+                  <label className="text-[9px] tracking-editorial uppercase text-muted-foreground">
+                    Precio €
+                  </label>
+                  <input
+                    type="number"
+                    step="0.10"
+                    value={p.price}
+                    onChange={(e) =>
+                      setProducts((arr) =>
+                        arr.map((x) =>
+                          x.id === p.id
+                            ? { ...x, price: parseFloat(e.target.value) || 0 }
+                            : x,
+                        ),
+                      )
+                    }
+                    className="w-20 bg-transparent border-b border-border tabular-nums text-sm py-1 focus:outline-none focus:border-[color:var(--gold)]"
+                  />
+                </div>
+              </div>
+              <button
+                onClick={() => setSoldOut((s) => ({ ...s, [p.id]: !s[p.id] }))}
+                className={`shrink-0 text-[10px] tracking-editorial uppercase rounded-full px-4 py-2.5 transition-colors ${
+                  out
+                    ? "bg-destructive text-destructive-foreground"
+                    : "border border-foreground hover:bg-foreground hover:text-background"
+                }`}
+              >
+                {out ? "Agotado" : "Disponible"}
+              </button>
+            </div>
+          );
+        })}
       </div>
 
-      <p className="text-[10px] text-muted-foreground text-center mt-8 uppercase tracking-widest">
+      <p className="text-[10px] tracking-editorial uppercase text-muted-foreground text-center mt-10">
         Boketto · POS interno
       </p>
     </div>
   );
 }
 
-/* ------------------------------- NAV ----------------------------------- */
+/* ============================ NAV ==================================== */
 function BottomNav({ view, setView }: { view: View; setView: (v: View) => void }) {
-  const items: { id: View; label: string; icon: string }[] = [
-    { id: "home", label: "Inicio", icon: "✨" },
-    { id: "carta", label: "Carta", icon: "🥐" },
-    { id: "estado", label: "Estado", icon: "⏱️" },
-    { id: "admin", label: "Admin", icon: "🔒" },
+  const items: { id: View; label: string }[] = [
+    { id: "home", label: "Inicio" },
+    { id: "carta", label: "Carta" },
+    { id: "estado", label: "Ticket" },
+    { id: "admin", label: "Admin" },
   ];
   return (
-    <nav className="fixed bottom-3 left-1/2 -translate-x-1/2 z-50 w-[min(96%,28rem)] bg-[var(--forest)] text-[color:var(--primary-foreground)] rounded-full px-2 py-2 flex items-center justify-between shadow-2xl">
-      {items.map((it) => {
-        const active = view === it.id;
-        return (
-          <button
-            key={it.id}
-            onClick={() => setView(it.id)}
-            className={`flex-1 flex flex-col items-center gap-0.5 py-1.5 rounded-full text-[10px] font-medium transition-all ${
-              active ? "bg-[var(--gold)] text-[var(--forest)] scale-105" : "opacity-70 hover:opacity-100"
-            }`}
-          >
-            <span className="text-base leading-none">{it.icon}</span>
-            <span className="tracking-wider uppercase">{it.label}</span>
-          </button>
-        );
-      })}
+    <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[min(94%,26rem)]">
+      <div className="bg-[color:var(--forest)] text-[color:var(--primary-foreground)] rounded-full px-3 py-2 flex items-center justify-between shadow-2xl backdrop-blur">
+        {items.map((it) => {
+          const active = view === it.id;
+          return (
+            <button
+              key={it.id}
+              onClick={() => setView(it.id)}
+              className={`flex-1 py-2 rounded-full text-[10px] tracking-editorial uppercase transition-all ${
+                active
+                  ? "bg-[color:var(--gold)] text-[color:var(--forest)] font-medium"
+                  : "opacity-60 hover:opacity-100"
+              }`}
+            >
+              {it.label}
+            </button>
+          );
+        })}
+      </div>
     </nav>
   );
 }
 
-/* ------------------------------ HELPERS -------------------------------- */
+/* ============================ HELPERS ================================ */
 function calcTotals(basket: BasketLine[], products: Product[]) {
   let total = 0;
   for (const line of basket) {
