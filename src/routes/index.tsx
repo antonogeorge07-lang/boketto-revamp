@@ -303,15 +303,6 @@ function Pillar({ eyebrow, title, body }: { eyebrow: string; title: string; body
   );
 }
 
-function Pillar({ eyebrow, title, body }: { eyebrow: string; title: string; body: string }) {
-  return (
-    <div className="bg-background p-10">
-      <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">{eyebrow}</p>
-      <h3 className="font-serif italic text-3xl mt-4">{title}</h3>
-      <p className="text-sm text-muted-foreground mt-4 leading-relaxed">{body}</p>
-    </div>
-  );
-}
 
 /* ============================ CARTA ================================== */
 function CartaView({
