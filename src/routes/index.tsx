@@ -320,6 +320,8 @@ function CartaView({
   onConfirm: () => void;
   totals: { count: number; total: number };
 }) {
+  const t = useT();
+  const { lang } = useLang();
   const [cat, setCat] = useState<Category>("cafeteria");
   const filtered = products.filter((p) => p.category === cat);
 
@@ -336,11 +338,14 @@ function CartaView({
 
   return (
     <div className="max-w-2xl mx-auto px-6 sm:px-10 pt-14">
+      <div className="flex justify-end mb-4">
+        <LanguageSwitcher tone="dark" />
+      </div>
       <header className="text-center">
         <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-          La Carta
+          {t("carta_eyebrow")}
         </p>
-        <h2 className="font-serif italic text-5xl mt-3">Selección del día</h2>
+        <h2 className="font-serif italic text-5xl mt-3">{t("carta_title")}</h2>
         <div className="hairline w-16 mx-auto mt-6" />
       </header>
 
@@ -360,9 +365,9 @@ function CartaView({
                 }`}
               >
                 <p className={`text-[10px] tracking-editorial uppercase font-medium`}>
-                  {c.label}
+                  {t(c.labelKey)}
                 </p>
-                <p className="font-serif italic text-xs opacity-70 mt-0.5">{c.sub}</p>
+                <p className="font-serif italic text-xs opacity-70 mt-0.5">{t(c.subKey)}</p>
               </button>
             );
           })}
@@ -386,9 +391,9 @@ function CartaView({
             >
               <div className="flex justify-between items-baseline gap-6">
                 <div className="min-w-0">
-                  <h3 className="font-serif text-2xl leading-tight">{p.name}</h3>
+                  <h3 className="font-serif text-2xl leading-tight">{tProduct(p.id, "name", lang, p.name)}</h3>
                   <p className="font-serif italic text-xs text-[color:var(--gold)] mt-1">
-                    {p.origin}
+                    {tProduct(p.id, "origin", lang, p.origin)}
                   </p>
                 </div>
                 <span className="shrink-0 text-sm tracking-wider tabular-nums text-muted-foreground">
@@ -396,12 +401,12 @@ function CartaView({
                 </span>
               </div>
               <p className="text-[12px] leading-relaxed text-muted-foreground mt-3 max-w-md">
-                {p.desc}
+                {tProduct(p.id, "desc", lang, p.desc)}
               </p>
 
               {out ? (
                 <p className="mt-4 text-[10px] tracking-editorial uppercase text-destructive">
-                  Agotado hoy
+                  {t("sold_out")}
                 </p>
               ) : (
                 <>
@@ -413,7 +418,7 @@ function CartaView({
                           className="border-l border-[color:var(--gold)]/40 pl-4 py-1 space-y-1.5"
                         >
                           <p className="text-[10px] tracking-editorial uppercase text-muted-foreground">
-                            Unidad {n + 1}
+                            {t("unit")} {n + 1}
                           </p>
                           {p.modifiers!.map((m) => (
                             <label
@@ -427,7 +432,7 @@ function CartaView({
                                   onChange={() => toggleMod(lineIdx, m.id)}
                                   className="accent-[color:var(--forest)]"
                                 />
-                                <span className="font-serif italic">{m.label}</span>
+                                <span className="font-serif italic">{tModifier(m.id, lang, m.label)}</span>
                               </span>
                               <span className="text-[color:var(--gold)] tabular-nums">
                                 +{m.price.toFixed(2)} €
@@ -438,7 +443,7 @@ function CartaView({
                             onClick={() => removeLine(lineIdx)}
                             className="text-[9px] tracking-editorial uppercase text-destructive hover:underline"
                           >
-                            Quitar
+                            {t("remove")}
                           </button>
                         </div>
                       ))}
@@ -450,14 +455,14 @@ function CartaView({
                       onClick={() => addLine(p.id)}
                       className="inline-flex items-center gap-3 border border-foreground rounded-full pl-4 pr-2 py-1.5 text-[10px] tracking-editorial uppercase hover:bg-foreground hover:text-background transition-colors"
                     >
-                      Añadir
+                      {t("add")}
                       <span className="grid place-items-center w-6 h-6 rounded-full border border-current">
                         +
                       </span>
                     </button>
                     {count > 0 && (
                       <span className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-                        × {count} en el pedido
+                        × {count} {t("in_order")}
                       </span>
                     )}
                   </div>
@@ -480,10 +485,10 @@ function CartaView({
             >
               <div className="text-left">
                 <p className="text-[9px] tracking-editorial uppercase text-[color:var(--gold)]">
-                  {totals.count} {totals.count === 1 ? "unidad" : "unidades"} · Pedido directo
+                  {totals.count} {totals.count === 1 ? t("units_one") : t("units_many")} · {t("direct_order")}
                 </p>
                 <p className="font-serif italic text-lg leading-tight">
-                  Confirmar · {totals.total.toFixed(2)} €
+                  {t("confirm")} · {totals.total.toFixed(2)} €
                 </p>
               </div>
               <span className="grid place-items-center w-12 h-12 rounded-full bg-[color:var(--gold)] text-[color:var(--forest)]">
@@ -496,6 +501,7 @@ function CartaView({
     </div>
   );
 }
+
 
 /* ============================ ESTADO ================================= */
 function EstadoView({
