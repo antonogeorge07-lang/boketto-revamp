@@ -1,10 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import heroImg from "../assets/hero.jpg";
+import { LanguageProvider, LanguageSwitcher, useLang, useT } from "../lib/i18n";
+import { tModifier, tProduct } from "../lib/i18n-products";
 
 export const Route = createFileRoute("/")({
-  component: BokettoApp,
+  component: BokettoRoot,
 });
+
+function BokettoRoot() {
+  return (
+    <LanguageProvider>
+      <BokettoApp />
+    </LanguageProvider>
+  );
+}
 
 type Modifier = { id: string; label: string; price: number };
 type Category = "cafeteria" | "reposteria" | "brunch";
