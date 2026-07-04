@@ -188,6 +188,7 @@ function BokettoApp() {
 
 /* ============================ HOME =================================== */
 function HomeView({ onEnter }: { onEnter: () => void }) {
+  const t = useT();
   return (
     <div>
       {/* Cinematic hero */}
@@ -203,30 +204,33 @@ function HomeView({ onEnter }: { onEnter: () => void }) {
         <div className="absolute inset-0 flex flex-col justify-between px-6 sm:px-10 py-10 sm:py-14 max-w-6xl mx-auto text-[color:var(--primary-foreground)]">
           <div className="flex items-center justify-between">
             <span className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-              Est · 2021
+              {t("home_est")}
             </span>
-            <span className="text-[10px] tracking-editorial uppercase opacity-80">
-              València · ES
-            </span>
+            <div className="flex items-center gap-4">
+              <span className="text-[10px] tracking-editorial uppercase opacity-80 hidden sm:inline">
+                {t("home_loc")}
+              </span>
+              <LanguageSwitcher tone="light" />
+            </div>
           </div>
 
           <div className="animate-rise-slow max-w-2xl">
             <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)] mb-4">
-              Specialty Coffee & Pastry
+              {t("home_eyebrow")}
             </p>
             <h1 className="font-serif italic text-6xl sm:text-8xl leading-[0.9]">
               Boketto
             </h1>
             <div className="hairline w-24 my-6" />
             <p className="font-serif italic text-xl sm:text-2xl max-w-lg leading-snug opacity-95">
-              "Mirar a la nada y que te sepa a Boketto."
+              {t("home_tagline")}
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-3">
               <button
                 onClick={onEnter}
                 className="group inline-flex items-center gap-3 bg-[color:var(--gold)] text-[color:var(--forest)] rounded-full pl-6 pr-3 py-3 text-[10px] tracking-editorial uppercase font-medium hover:bg-[color:var(--primary-foreground)] transition-colors"
               >
-                Explorar la carta
+                {t("home_cta_explore")}
                 <span className="grid place-items-center w-8 h-8 rounded-full bg-[color:var(--forest)] text-[color:var(--gold)] transition-transform group-hover:translate-x-0.5">
                   →
                 </span>
@@ -237,7 +241,7 @@ function HomeView({ onEnter }: { onEnter: () => void }) {
                 rel="noreferrer"
                 className="text-[10px] tracking-editorial uppercase border-b border-[color:var(--gold)]/60 pb-1 hover:border-[color:var(--gold)]"
               >
-                Reservar mesa →
+                {t("home_cta_reserve")}
               </a>
             </div>
           </div>
@@ -247,38 +251,29 @@ function HomeView({ onEnter }: { onEnter: () => void }) {
       {/* Manifiesto */}
       <section className="max-w-3xl mx-auto px-6 sm:px-10 pt-24 pb-16 text-center">
         <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)] mb-6">
-          Manifiesto
+          {t("home_manifest_eyebrow")}
         </p>
         <p className="font-serif italic text-3xl sm:text-4xl leading-tight">
-          Pastelería pensada como un pequeño ensayo comestible.
-          Café tratado como materia viva.
+          {t("home_manifest")}
         </p>
         <div className="hairline w-16 mx-auto mt-10" />
       </section>
 
       {/* Two-pillar editorial split */}
       <section className="max-w-5xl mx-auto px-6 sm:px-10 pb-20 grid md:grid-cols-2 gap-px bg-border">
-        <Pillar
-          eyebrow="01 — Café"
-          title="De especialidad, taza a taza"
-          body="Granos de origen único, tostados lentamente. Extracción calibrada cada mañana. Ristrettos densos, filtrados limpios, matchas ceremoniales."
-        />
-        <Pillar
-          eyebrow="02 — Pastelería"
-          title="De autor, sin excesos"
-          body="Masas de fermentación larga, mantequilla AOP y azúcares justos. Si el postre empalaga, no es de Boketto."
-        />
+        <Pillar eyebrow={t("pillar_01")} title={t("pillar_01_title")} body={t("pillar_01_body")} />
+        <Pillar eyebrow={t("pillar_02")} title={t("pillar_02_title")} body={t("pillar_02_body")} />
       </section>
 
       {/* Reserva */}
       <section className="max-w-3xl mx-auto px-6 sm:px-10 pb-24">
         <div className="border border-border rounded-3xl p-10 text-center bg-card">
           <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)] mb-4">
-            Reserva
+            {t("reserve_eyebrow")}
           </p>
-          <h3 className="font-serif italic text-3xl">Aforo reducido, servicio pausado.</h3>
+          <h3 className="font-serif italic text-3xl">{t("reserve_title")}</h3>
           <p className="text-sm text-muted-foreground mt-4 max-w-md mx-auto leading-relaxed">
-            Guillem Sorolla 29, València. Escríbenos por WhatsApp y confirmamos al instante.
+            {t("reserve_body")}
           </p>
           <a
             href="https://wa.me/34614191802?text=Hola%20Boketto%2C%20quiero%20reservar%20mesa"
@@ -286,14 +281,24 @@ function HomeView({ onEnter }: { onEnter: () => void }) {
             rel="noreferrer"
             className="mt-8 inline-flex items-center gap-2 border border-foreground rounded-full px-6 py-3 text-[10px] tracking-editorial uppercase font-medium hover:bg-foreground hover:text-background transition-colors"
           >
-            Reservar por WhatsApp
+            {t("reserve_cta")}
           </a>
         </div>
       </section>
 
       <p className="text-[10px] tracking-editorial uppercase text-center text-muted-foreground pb-16">
-        Boketto · Guillem Sorolla 29 · València
+        {t("footer")}
       </p>
+    </div>
+  );
+}
+
+function Pillar({ eyebrow, title, body }: { eyebrow: string; title: string; body: string }) {
+  return (
+    <div className="bg-background p-10">
+      <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">{eyebrow}</p>
+      <h3 className="font-serif italic text-3xl mt-4">{title}</h3>
+      <p className="text-sm text-muted-foreground mt-4 leading-relaxed">{body}</p>
     </div>
   );
 }
