@@ -1,10 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import heroImg from "../assets/hero.jpg";
+import { LanguageProvider, LanguageSwitcher, useLang, useT } from "../lib/i18n";
+import { tModifier, tProduct } from "../lib/i18n-products";
 
 export const Route = createFileRoute("/")({
-  component: BokettoApp,
+  component: BokettoRoot,
 });
+
+function BokettoRoot() {
+  return (
+    <LanguageProvider>
+      <BokettoApp />
+    </LanguageProvider>
+  );
+}
 
 type Modifier = { id: string; label: string; price: number };
 type Category = "cafeteria" | "reposteria" | "brunch";
@@ -18,10 +28,10 @@ type Product = {
   modifiers?: Modifier[];
 };
 
-const CATS: { id: Category; label: string; sub: string }[] = [
-  { id: "cafeteria", label: "Cafetería", sub: "de especialidad" },
-  { id: "reposteria", label: "Boulangerie", sub: "de autor" },
-  { id: "brunch", label: "Brunch", sub: "fermentación lenta" },
+const CATS: { id: Category; labelKey: "cat_cafeteria" | "cat_reposteria" | "cat_brunch"; subKey: "cat_cafeteria_sub" | "cat_reposteria_sub" | "cat_brunch_sub" }[] = [
+  { id: "cafeteria", labelKey: "cat_cafeteria", subKey: "cat_cafeteria_sub" },
+  { id: "reposteria", labelKey: "cat_reposteria", subKey: "cat_reposteria_sub" },
+  { id: "brunch", labelKey: "cat_brunch", subKey: "cat_brunch_sub" },
 ];
 
 const INITIAL_PRODUCTS: Product[] = [
@@ -178,6 +188,7 @@ function BokettoApp() {
 
 /* ============================ HOME =================================== */
 function HomeView({ onEnter }: { onEnter: () => void }) {
+  const t = useT();
   return (
     <div>
       {/* Cinematic hero */}
@@ -193,30 +204,33 @@ function HomeView({ onEnter }: { onEnter: () => void }) {
         <div className="absolute inset-0 flex flex-col justify-between px-6 sm:px-10 py-10 sm:py-14 max-w-6xl mx-auto text-[color:var(--primary-foreground)]">
           <div className="flex items-center justify-between">
             <span className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-              Est · 2021
+              {t("home_est")}
             </span>
-            <span className="text-[10px] tracking-editorial uppercase opacity-80">
-              València · ES
-            </span>
+            <div className="flex items-center gap-4">
+              <span className="text-[10px] tracking-editorial uppercase opacity-80 hidden sm:inline">
+                {t("home_loc")}
+              </span>
+              <LanguageSwitcher tone="light" />
+            </div>
           </div>
 
           <div className="animate-rise-slow max-w-2xl">
             <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)] mb-4">
-              Specialty Coffee & Pastry
+              {t("home_eyebrow")}
             </p>
             <h1 className="font-serif italic text-6xl sm:text-8xl leading-[0.9]">
               Boketto
             </h1>
             <div className="hairline w-24 my-6" />
             <p className="font-serif italic text-xl sm:text-2xl max-w-lg leading-snug opacity-95">
-              "Mirar a la nada y que te sepa a Boketto."
+              {t("home_tagline")}
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-3">
               <button
                 onClick={onEnter}
                 className="group inline-flex items-center gap-3 bg-[color:var(--gold)] text-[color:var(--forest)] rounded-full pl-6 pr-3 py-3 text-[10px] tracking-editorial uppercase font-medium hover:bg-[color:var(--primary-foreground)] transition-colors"
               >
-                Explorar la carta
+                {t("home_cta_explore")}
                 <span className="grid place-items-center w-8 h-8 rounded-full bg-[color:var(--forest)] text-[color:var(--gold)] transition-transform group-hover:translate-x-0.5">
                   →
                 </span>
@@ -227,7 +241,7 @@ function HomeView({ onEnter }: { onEnter: () => void }) {
                 rel="noreferrer"
                 className="text-[10px] tracking-editorial uppercase border-b border-[color:var(--gold)]/60 pb-1 hover:border-[color:var(--gold)]"
               >
-                Reservar mesa →
+                {t("home_cta_reserve")}
               </a>
             </div>
           </div>
@@ -237,38 +251,29 @@ function HomeView({ onEnter }: { onEnter: () => void }) {
       {/* Manifiesto */}
       <section className="max-w-3xl mx-auto px-6 sm:px-10 pt-24 pb-16 text-center">
         <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)] mb-6">
-          Manifiesto
+          {t("home_manifest_eyebrow")}
         </p>
         <p className="font-serif italic text-3xl sm:text-4xl leading-tight">
-          Pastelería pensada como un pequeño ensayo comestible.
-          Café tratado como materia viva.
+          {t("home_manifest")}
         </p>
         <div className="hairline w-16 mx-auto mt-10" />
       </section>
 
       {/* Two-pillar editorial split */}
       <section className="max-w-5xl mx-auto px-6 sm:px-10 pb-20 grid md:grid-cols-2 gap-px bg-border">
-        <Pillar
-          eyebrow="01 — Café"
-          title="De especialidad, taza a taza"
-          body="Granos de origen único, tostados lentamente. Extracción calibrada cada mañana. Ristrettos densos, filtrados limpios, matchas ceremoniales."
-        />
-        <Pillar
-          eyebrow="02 — Pastelería"
-          title="De autor, sin excesos"
-          body="Masas de fermentación larga, mantequilla AOP y azúcares justos. Si el postre empalaga, no es de Boketto."
-        />
+        <Pillar eyebrow={t("pillar_01")} title={t("pillar_01_title")} body={t("pillar_01_body")} />
+        <Pillar eyebrow={t("pillar_02")} title={t("pillar_02_title")} body={t("pillar_02_body")} />
       </section>
 
       {/* Reserva */}
       <section className="max-w-3xl mx-auto px-6 sm:px-10 pb-24">
         <div className="border border-border rounded-3xl p-10 text-center bg-card">
           <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)] mb-4">
-            Reserva
+            {t("reserve_eyebrow")}
           </p>
-          <h3 className="font-serif italic text-3xl">Aforo reducido, servicio pausado.</h3>
+          <h3 className="font-serif italic text-3xl">{t("reserve_title")}</h3>
           <p className="text-sm text-muted-foreground mt-4 max-w-md mx-auto leading-relaxed">
-            Guillem Sorolla 29, València. Escríbenos por WhatsApp y confirmamos al instante.
+            {t("reserve_body")}
           </p>
           <a
             href="https://wa.me/34614191802?text=Hola%20Boketto%2C%20quiero%20reservar%20mesa"
@@ -276,13 +281,13 @@ function HomeView({ onEnter }: { onEnter: () => void }) {
             rel="noreferrer"
             className="mt-8 inline-flex items-center gap-2 border border-foreground rounded-full px-6 py-3 text-[10px] tracking-editorial uppercase font-medium hover:bg-foreground hover:text-background transition-colors"
           >
-            Reservar por WhatsApp
+            {t("reserve_cta")}
           </a>
         </div>
       </section>
 
       <p className="text-[10px] tracking-editorial uppercase text-center text-muted-foreground pb-16">
-        Boketto · Guillem Sorolla 29 · València
+        {t("footer")}
       </p>
     </div>
   );
@@ -297,6 +302,7 @@ function Pillar({ eyebrow, title, body }: { eyebrow: string; title: string; body
     </div>
   );
 }
+
 
 /* ============================ CARTA ================================== */
 function CartaView({
@@ -314,6 +320,8 @@ function CartaView({
   onConfirm: () => void;
   totals: { count: number; total: number };
 }) {
+  const t = useT();
+  const { lang } = useLang();
   const [cat, setCat] = useState<Category>("cafeteria");
   const filtered = products.filter((p) => p.category === cat);
 
@@ -330,11 +338,14 @@ function CartaView({
 
   return (
     <div className="max-w-2xl mx-auto px-6 sm:px-10 pt-14">
+      <div className="flex justify-end mb-4">
+        <LanguageSwitcher tone="dark" />
+      </div>
       <header className="text-center">
         <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-          La Carta
+          {t("carta_eyebrow")}
         </p>
-        <h2 className="font-serif italic text-5xl mt-3">Selección del día</h2>
+        <h2 className="font-serif italic text-5xl mt-3">{t("carta_title")}</h2>
         <div className="hairline w-16 mx-auto mt-6" />
       </header>
 
@@ -354,9 +365,9 @@ function CartaView({
                 }`}
               >
                 <p className={`text-[10px] tracking-editorial uppercase font-medium`}>
-                  {c.label}
+                  {t(c.labelKey)}
                 </p>
-                <p className="font-serif italic text-xs opacity-70 mt-0.5">{c.sub}</p>
+                <p className="font-serif italic text-xs opacity-70 mt-0.5">{t(c.subKey)}</p>
               </button>
             );
           })}
@@ -380,9 +391,9 @@ function CartaView({
             >
               <div className="flex justify-between items-baseline gap-6">
                 <div className="min-w-0">
-                  <h3 className="font-serif text-2xl leading-tight">{p.name}</h3>
+                  <h3 className="font-serif text-2xl leading-tight">{tProduct(p.id, "name", lang, p.name)}</h3>
                   <p className="font-serif italic text-xs text-[color:var(--gold)] mt-1">
-                    {p.origin}
+                    {tProduct(p.id, "origin", lang, p.origin)}
                   </p>
                 </div>
                 <span className="shrink-0 text-sm tracking-wider tabular-nums text-muted-foreground">
@@ -390,12 +401,12 @@ function CartaView({
                 </span>
               </div>
               <p className="text-[12px] leading-relaxed text-muted-foreground mt-3 max-w-md">
-                {p.desc}
+                {tProduct(p.id, "desc", lang, p.desc)}
               </p>
 
               {out ? (
                 <p className="mt-4 text-[10px] tracking-editorial uppercase text-destructive">
-                  Agotado hoy
+                  {t("sold_out")}
                 </p>
               ) : (
                 <>
@@ -407,7 +418,7 @@ function CartaView({
                           className="border-l border-[color:var(--gold)]/40 pl-4 py-1 space-y-1.5"
                         >
                           <p className="text-[10px] tracking-editorial uppercase text-muted-foreground">
-                            Unidad {n + 1}
+                            {t("unit")} {n + 1}
                           </p>
                           {p.modifiers!.map((m) => (
                             <label
@@ -421,7 +432,7 @@ function CartaView({
                                   onChange={() => toggleMod(lineIdx, m.id)}
                                   className="accent-[color:var(--forest)]"
                                 />
-                                <span className="font-serif italic">{m.label}</span>
+                                <span className="font-serif italic">{tModifier(m.id, lang, m.label)}</span>
                               </span>
                               <span className="text-[color:var(--gold)] tabular-nums">
                                 +{m.price.toFixed(2)} €
@@ -432,7 +443,7 @@ function CartaView({
                             onClick={() => removeLine(lineIdx)}
                             className="text-[9px] tracking-editorial uppercase text-destructive hover:underline"
                           >
-                            Quitar
+                            {t("remove")}
                           </button>
                         </div>
                       ))}
@@ -444,14 +455,14 @@ function CartaView({
                       onClick={() => addLine(p.id)}
                       className="inline-flex items-center gap-3 border border-foreground rounded-full pl-4 pr-2 py-1.5 text-[10px] tracking-editorial uppercase hover:bg-foreground hover:text-background transition-colors"
                     >
-                      Añadir
+                      {t("add")}
                       <span className="grid place-items-center w-6 h-6 rounded-full border border-current">
                         +
                       </span>
                     </button>
                     {count > 0 && (
                       <span className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-                        × {count} en el pedido
+                        × {count} {t("in_order")}
                       </span>
                     )}
                   </div>
@@ -474,10 +485,10 @@ function CartaView({
             >
               <div className="text-left">
                 <p className="text-[9px] tracking-editorial uppercase text-[color:var(--gold)]">
-                  {totals.count} {totals.count === 1 ? "unidad" : "unidades"} · Pedido directo
+                  {totals.count} {totals.count === 1 ? t("units_one") : t("units_many")} · {t("direct_order")}
                 </p>
                 <p className="font-serif italic text-lg leading-tight">
-                  Confirmar · {totals.total.toFixed(2)} €
+                  {t("confirm")} · {totals.total.toFixed(2)} €
                 </p>
               </div>
               <span className="grid place-items-center w-12 h-12 rounded-full bg-[color:var(--gold)] text-[color:var(--forest)]">
@@ -491,6 +502,7 @@ function CartaView({
   );
 }
 
+
 /* ============================ ESTADO ================================= */
 function EstadoView({
   lines,
@@ -503,7 +515,9 @@ function EstadoView({
   onBack: () => void;
   onNew: () => void;
 }) {
-  const detail = useMemo(() => buildLineDetail(lines, products), [lines, products]);
+  const t = useT();
+  const { lang } = useLang();
+  const detail = useMemo(() => buildLineDetail(lines, products, lang), [lines, products, lang]);
   const total = detail.reduce((s, l) => s + l.total, 0);
   const orderId = useMemo(
     () => "BKT-" + Math.floor(100 + Math.random() * 900),
@@ -528,18 +542,21 @@ function EstadoView({
   if (lines.length === 0) {
     return (
       <div className="max-w-md mx-auto px-6 pt-32 text-center animate-rise">
+        <div className="flex justify-end mb-6">
+          <LanguageSwitcher tone="dark" />
+        </div>
         <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-          Ticket
+          {t("no_order_eyebrow")}
         </p>
-        <h2 className="font-serif italic text-4xl mt-3">Aún sin pedido</h2>
+        <h2 className="font-serif italic text-4xl mt-3">{t("no_order_title")}</h2>
         <p className="text-sm text-muted-foreground mt-4">
-          Añade productos desde la carta para generar tu recibo digital.
+          {t("no_order_body")}
         </p>
         <button
           onClick={onBack}
           className="mt-8 inline-flex items-center gap-3 border border-foreground rounded-full pl-5 pr-2 py-2 text-[10px] tracking-editorial uppercase hover:bg-foreground hover:text-background transition-colors"
         >
-          Ir a la carta
+          {t("go_menu")}
           <span className="grid place-items-center w-7 h-7 rounded-full bg-foreground text-background">
             →
           </span>
@@ -550,11 +567,14 @@ function EstadoView({
 
   return (
     <div className="max-w-md mx-auto px-6 pt-14">
+      <div className="flex justify-end mb-4">
+        <LanguageSwitcher tone="dark" />
+      </div>
       <header className="text-center">
         <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-          Ticket digital
+          {t("ticket_eyebrow")}
         </p>
-        <h2 className="font-serif italic text-4xl mt-3">Tu recibo Boketto</h2>
+        <h2 className="font-serif italic text-4xl mt-3">{t("ticket_title")}</h2>
         <div className="hairline w-16 mx-auto mt-6" />
       </header>
 
@@ -563,13 +583,13 @@ function EstadoView({
         <div className="flex justify-between items-start mb-8">
           <div>
             <p className="text-[9px] tracking-editorial uppercase text-[color:var(--gold)] mb-1">
-              Ticket activo
+              {t("ticket_active")}
             </p>
             <h3 className="font-serif italic text-3xl leading-none">Boketto</h3>
             <p className="text-[10px] opacity-60 mt-2">Guillem Sorolla 29 · València</p>
           </div>
           <div className="text-right">
-            <p className="text-[9px] tracking-editorial uppercase opacity-60">Orden</p>
+            <p className="text-[9px] tracking-editorial uppercase opacity-60">{t("order")}</p>
             <p className="font-serif text-xl mt-1">#{orderId}</p>
           </div>
         </div>
@@ -602,7 +622,7 @@ function EstadoView({
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--gold)] animate-pulse" />
             <span className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-              En barra
+              {t("at_bar")}
             </span>
           </div>
           <span className="font-serif italic text-3xl">{total.toFixed(2)} €</span>
@@ -618,9 +638,9 @@ function EstadoView({
       >
         <div className="text-left">
           <p className="text-[9px] tracking-editorial uppercase text-[color:var(--gold)]">
-            Sin comisiones
+            {t("no_fees")}
           </p>
-          <p className="font-serif italic text-base leading-tight">Enviar por WhatsApp</p>
+          <p className="font-serif italic text-base leading-tight">{t("send_wa")}</p>
         </div>
         <span className="grid place-items-center w-11 h-11 rounded-full bg-[color:var(--gold)] text-[color:var(--forest)]">
           →
@@ -632,13 +652,13 @@ function EstadoView({
           onClick={onBack}
           className="border border-border rounded-full py-3 text-[10px] tracking-editorial uppercase hover:border-foreground transition-colors"
         >
-          Editar
+          {t("edit")}
         </button>
         <button
           onClick={onNew}
           className="border border-border rounded-full py-3 text-[10px] tracking-editorial uppercase hover:border-foreground transition-colors"
         >
-          Nuevo ticket
+          {t("new_ticket")}
         </button>
       </div>
     </div>
@@ -661,22 +681,27 @@ function AdminView({
   dark: boolean;
   setDark: (v: boolean) => void;
 }) {
+  const t = useT();
+  const { lang } = useLang();
   return (
     <div className="max-w-2xl mx-auto px-6 sm:px-10 pt-14">
+      <div className="flex justify-end mb-4">
+        <LanguageSwitcher tone="dark" />
+      </div>
       <header className="text-center">
         <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-          Panel interno
+          {t("admin_eyebrow")}
         </p>
-        <h2 className="font-serif italic text-4xl mt-3">Barra & stock</h2>
+        <h2 className="font-serif italic text-4xl mt-3">{t("admin_title")}</h2>
         <div className="hairline w-16 mx-auto mt-6" />
       </header>
 
       {/* Dark mode toggle */}
       <div className="mt-10 border border-border rounded-2xl p-6 flex items-center justify-between gap-4">
         <div className="min-w-0">
-          <p className="font-serif italic text-xl">Modo nocturno</p>
+          <p className="font-serif italic text-xl">{t("night_mode")}</p>
           <p className="text-[11px] text-muted-foreground mt-1">
-            Cambia la piel pública al instante.
+            {t("night_mode_body")}
           </p>
         </div>
         <button
@@ -704,13 +729,13 @@ function AdminView({
               className="bg-background p-5 grid grid-cols-[minmax(0,1fr)_auto] gap-4 items-center"
             >
               <div className="min-w-0">
-                <p className="font-serif text-lg truncate">{p.name}</p>
+                <p className="font-serif text-lg truncate">{tProduct(p.id, "name", lang, p.name)}</p>
                 <p className="font-serif italic text-[11px] text-[color:var(--gold)] truncate">
-                  {p.origin}
+                  {tProduct(p.id, "origin", lang, p.origin)}
                 </p>
                 <div className="mt-3 flex items-center gap-2">
                   <label className="text-[9px] tracking-editorial uppercase text-muted-foreground">
-                    Precio €
+                    {t("price_eur")}
                   </label>
                   <input
                     type="number"
@@ -737,7 +762,7 @@ function AdminView({
                     : "border border-foreground hover:bg-foreground hover:text-background"
                 }`}
               >
-                {out ? "Agotado" : "Disponible"}
+                {out ? t("agotado") : t("available")}
               </button>
             </div>
           );
@@ -745,7 +770,7 @@ function AdminView({
       </div>
 
       <p className="text-[10px] tracking-editorial uppercase text-muted-foreground text-center mt-10">
-        Boketto · POS interno
+        {t("pos_footer")}
       </p>
     </div>
   );
@@ -753,11 +778,12 @@ function AdminView({
 
 /* ============================ NAV ==================================== */
 function BottomNav({ view, setView }: { view: View; setView: (v: View) => void }) {
-  const items: { id: View; label: string }[] = [
-    { id: "home", label: "Inicio" },
-    { id: "carta", label: "Carta" },
-    { id: "estado", label: "Ticket" },
-    { id: "admin", label: "Admin" },
+  const t = useT();
+  const items: { id: View; labelKey: "nav_home" | "nav_carta" | "nav_estado" | "nav_admin" }[] = [
+    { id: "home", labelKey: "nav_home" },
+    { id: "carta", labelKey: "nav_carta" },
+    { id: "estado", labelKey: "nav_estado" },
+    { id: "admin", labelKey: "nav_admin" },
   ];
   return (
     <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[min(94%,26rem)]">
@@ -774,7 +800,7 @@ function BottomNav({ view, setView }: { view: View; setView: (v: View) => void }
                   : "opacity-60 hover:opacity-100"
               }`}
             >
-              {it.label}
+              {t(it.labelKey)}
             </button>
           );
         })}
@@ -782,6 +808,7 @@ function BottomNav({ view, setView }: { view: View; setView: (v: View) => void }
     </nav>
   );
 }
+
 
 /* ============================ HELPERS ================================ */
 function calcTotals(basket: BasketLine[], products: Product[]) {
@@ -795,11 +822,14 @@ function calcTotals(basket: BasketLine[], products: Product[]) {
   return { count: basket.length, total };
 }
 
-function buildLineDetail(basket: BasketLine[], products: Product[]) {
+function buildLineDetail(basket: BasketLine[], products: Product[], lang: import("../lib/i18n").Lang) {
   return basket.map((line) => {
     const p = products.find((x) => x.id === line.productId)!;
-    const mods = (p.modifiers ?? []).filter((m) => line.modifiers[m.id]);
+    const mods = (p.modifiers ?? []).filter((m) => line.modifiers[m.id]).map((m) => ({
+      ...m,
+      label: tModifier(m.id, lang, m.label),
+    }));
     const total = p.price + mods.reduce((s, m) => s + m.price, 0);
-    return { name: p.name, base: p.price, mods, total };
+    return { name: tProduct(p.id, "name", lang, p.name), base: p.price, mods, total };
   });
 }
