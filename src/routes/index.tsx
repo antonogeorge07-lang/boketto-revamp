@@ -28,10 +28,10 @@ type Product = {
   modifiers?: Modifier[];
 };
 
-const CATS: { id: Category; label: string; sub: string }[] = [
-  { id: "cafeteria", label: "Cafetería", sub: "de especialidad" },
-  { id: "reposteria", label: "Boulangerie", sub: "de autor" },
-  { id: "brunch", label: "Brunch", sub: "fermentación lenta" },
+const CATS: { id: Category; labelKey: "cat_cafeteria" | "cat_reposteria" | "cat_brunch"; subKey: "cat_cafeteria_sub" | "cat_reposteria_sub" | "cat_brunch_sub" }[] = [
+  { id: "cafeteria", labelKey: "cat_cafeteria", subKey: "cat_cafeteria_sub" },
+  { id: "reposteria", labelKey: "cat_reposteria", subKey: "cat_reposteria_sub" },
+  { id: "brunch", labelKey: "cat_brunch", subKey: "cat_brunch_sub" },
 ];
 
 const INITIAL_PRODUCTS: Product[] = [
