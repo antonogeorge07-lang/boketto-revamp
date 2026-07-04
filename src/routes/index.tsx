@@ -822,11 +822,14 @@ function calcTotals(basket: BasketLine[], products: Product[]) {
   return { count: basket.length, total };
 }
 
-function buildLineDetail(basket: BasketLine[], products: Product[]) {
+function buildLineDetail(basket: BasketLine[], products: Product[], lang: import("../lib/i18n").Lang) {
   return basket.map((line) => {
     const p = products.find((x) => x.id === line.productId)!;
-    const mods = (p.modifiers ?? []).filter((m) => line.modifiers[m.id]);
+    const mods = (p.modifiers ?? []).filter((m) => line.modifiers[m.id]).map((m) => ({
+      ...m,
+      label: tModifier(m.id, lang, m.label),
+    }));
     const total = p.price + mods.reduce((s, m) => s + m.price, 0);
-    return { name: p.name, base: p.price, mods, total };
+    return { name: tProduct(p.id, "name", lang, p.name), base: p.price, mods, total };
   });
 }
