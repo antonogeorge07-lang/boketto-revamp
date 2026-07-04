@@ -515,7 +515,9 @@ function EstadoView({
   onBack: () => void;
   onNew: () => void;
 }) {
-  const detail = useMemo(() => buildLineDetail(lines, products), [lines, products]);
+  const t = useT();
+  const { lang } = useLang();
+  const detail = useMemo(() => buildLineDetail(lines, products, lang), [lines, products, lang]);
   const total = detail.reduce((s, l) => s + l.total, 0);
   const orderId = useMemo(
     () => "BKT-" + Math.floor(100 + Math.random() * 900),
@@ -540,18 +542,21 @@ function EstadoView({
   if (lines.length === 0) {
     return (
       <div className="max-w-md mx-auto px-6 pt-32 text-center animate-rise">
+        <div className="flex justify-end mb-6">
+          <LanguageSwitcher tone="dark" />
+        </div>
         <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-          Ticket
+          {t("no_order_eyebrow")}
         </p>
-        <h2 className="font-serif italic text-4xl mt-3">Aún sin pedido</h2>
+        <h2 className="font-serif italic text-4xl mt-3">{t("no_order_title")}</h2>
         <p className="text-sm text-muted-foreground mt-4">
-          Añade productos desde la carta para generar tu recibo digital.
+          {t("no_order_body")}
         </p>
         <button
           onClick={onBack}
           className="mt-8 inline-flex items-center gap-3 border border-foreground rounded-full pl-5 pr-2 py-2 text-[10px] tracking-editorial uppercase hover:bg-foreground hover:text-background transition-colors"
         >
-          Ir a la carta
+          {t("go_menu")}
           <span className="grid place-items-center w-7 h-7 rounded-full bg-foreground text-background">
             →
           </span>
@@ -562,11 +567,14 @@ function EstadoView({
 
   return (
     <div className="max-w-md mx-auto px-6 pt-14">
+      <div className="flex justify-end mb-4">
+        <LanguageSwitcher tone="dark" />
+      </div>
       <header className="text-center">
         <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-          Ticket digital
+          {t("ticket_eyebrow")}
         </p>
-        <h2 className="font-serif italic text-4xl mt-3">Tu recibo Boketto</h2>
+        <h2 className="font-serif italic text-4xl mt-3">{t("ticket_title")}</h2>
         <div className="hairline w-16 mx-auto mt-6" />
       </header>
 
@@ -575,13 +583,13 @@ function EstadoView({
         <div className="flex justify-between items-start mb-8">
           <div>
             <p className="text-[9px] tracking-editorial uppercase text-[color:var(--gold)] mb-1">
-              Ticket activo
+              {t("ticket_active")}
             </p>
             <h3 className="font-serif italic text-3xl leading-none">Boketto</h3>
             <p className="text-[10px] opacity-60 mt-2">Guillem Sorolla 29 · València</p>
           </div>
           <div className="text-right">
-            <p className="text-[9px] tracking-editorial uppercase opacity-60">Orden</p>
+            <p className="text-[9px] tracking-editorial uppercase opacity-60">{t("order")}</p>
             <p className="font-serif text-xl mt-1">#{orderId}</p>
           </div>
         </div>
@@ -614,7 +622,7 @@ function EstadoView({
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--gold)] animate-pulse" />
             <span className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-              En barra
+              {t("at_bar")}
             </span>
           </div>
           <span className="font-serif italic text-3xl">{total.toFixed(2)} €</span>
@@ -630,9 +638,9 @@ function EstadoView({
       >
         <div className="text-left">
           <p className="text-[9px] tracking-editorial uppercase text-[color:var(--gold)]">
-            Sin comisiones
+            {t("no_fees")}
           </p>
-          <p className="font-serif italic text-base leading-tight">Enviar por WhatsApp</p>
+          <p className="font-serif italic text-base leading-tight">{t("send_wa")}</p>
         </div>
         <span className="grid place-items-center w-11 h-11 rounded-full bg-[color:var(--gold)] text-[color:var(--forest)]">
           →
@@ -644,13 +652,13 @@ function EstadoView({
           onClick={onBack}
           className="border border-border rounded-full py-3 text-[10px] tracking-editorial uppercase hover:border-foreground transition-colors"
         >
-          Editar
+          {t("edit")}
         </button>
         <button
           onClick={onNew}
           className="border border-border rounded-full py-3 text-[10px] tracking-editorial uppercase hover:border-foreground transition-colors"
         >
-          Nuevo ticket
+          {t("new_ticket")}
         </button>
       </div>
     </div>
@@ -673,22 +681,27 @@ function AdminView({
   dark: boolean;
   setDark: (v: boolean) => void;
 }) {
+  const t = useT();
+  const { lang } = useLang();
   return (
     <div className="max-w-2xl mx-auto px-6 sm:px-10 pt-14">
+      <div className="flex justify-end mb-4">
+        <LanguageSwitcher tone="dark" />
+      </div>
       <header className="text-center">
         <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-          Panel interno
+          {t("admin_eyebrow")}
         </p>
-        <h2 className="font-serif italic text-4xl mt-3">Barra & stock</h2>
+        <h2 className="font-serif italic text-4xl mt-3">{t("admin_title")}</h2>
         <div className="hairline w-16 mx-auto mt-6" />
       </header>
 
       {/* Dark mode toggle */}
       <div className="mt-10 border border-border rounded-2xl p-6 flex items-center justify-between gap-4">
         <div className="min-w-0">
-          <p className="font-serif italic text-xl">Modo nocturno</p>
+          <p className="font-serif italic text-xl">{t("night_mode")}</p>
           <p className="text-[11px] text-muted-foreground mt-1">
-            Cambia la piel pública al instante.
+            {t("night_mode_body")}
           </p>
         </div>
         <button
@@ -716,13 +729,13 @@ function AdminView({
               className="bg-background p-5 grid grid-cols-[minmax(0,1fr)_auto] gap-4 items-center"
             >
               <div className="min-w-0">
-                <p className="font-serif text-lg truncate">{p.name}</p>
+                <p className="font-serif text-lg truncate">{tProduct(p.id, "name", lang, p.name)}</p>
                 <p className="font-serif italic text-[11px] text-[color:var(--gold)] truncate">
-                  {p.origin}
+                  {tProduct(p.id, "origin", lang, p.origin)}
                 </p>
                 <div className="mt-3 flex items-center gap-2">
                   <label className="text-[9px] tracking-editorial uppercase text-muted-foreground">
-                    Precio €
+                    {t("price_eur")}
                   </label>
                   <input
                     type="number"
@@ -749,7 +762,7 @@ function AdminView({
                     : "border border-foreground hover:bg-foreground hover:text-background"
                 }`}
               >
-                {out ? "Agotado" : "Disponible"}
+                {out ? t("agotado") : t("available")}
               </button>
             </div>
           );
@@ -757,7 +770,7 @@ function AdminView({
       </div>
 
       <p className="text-[10px] tracking-editorial uppercase text-muted-foreground text-center mt-10">
-        Boketto · POS interno
+        {t("pos_footer")}
       </p>
     </div>
   );
@@ -765,11 +778,12 @@ function AdminView({
 
 /* ============================ NAV ==================================== */
 function BottomNav({ view, setView }: { view: View; setView: (v: View) => void }) {
-  const items: { id: View; label: string }[] = [
-    { id: "home", label: "Inicio" },
-    { id: "carta", label: "Carta" },
-    { id: "estado", label: "Ticket" },
-    { id: "admin", label: "Admin" },
+  const t = useT();
+  const items: { id: View; labelKey: "nav_home" | "nav_carta" | "nav_estado" | "nav_admin" }[] = [
+    { id: "home", labelKey: "nav_home" },
+    { id: "carta", labelKey: "nav_carta" },
+    { id: "estado", labelKey: "nav_estado" },
+    { id: "admin", labelKey: "nav_admin" },
   ];
   return (
     <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[min(94%,26rem)]">
@@ -786,7 +800,7 @@ function BottomNav({ view, setView }: { view: View; setView: (v: View) => void }
                   : "opacity-60 hover:opacity-100"
               }`}
             >
-              {it.label}
+              {t(it.labelKey)}
             </button>
           );
         })}
@@ -794,6 +808,7 @@ function BottomNav({ view, setView }: { view: View; setView: (v: View) => void }
     </nav>
   );
 }
+
 
 /* ============================ HELPERS ================================ */
 function calcTotals(basket: BasketLine[], products: Product[]) {
