@@ -1,835 +1,663 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import heroImg from "../assets/hero.jpg";
-import { LanguageProvider, LanguageSwitcher, useLang, useT } from "../lib/i18n";
-import { tModifier, tProduct } from "../lib/i18n-products";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { CATEGORY_META, useStore, type Category, type Modifier, type OrderLine, type Product } from "../lib/store";
+import { LanguageSwitcher } from "../lib/i18n";
 
 export const Route = createFileRoute("/")({
-  component: BokettoRoot,
+  component: PublicStorefront,
 });
 
-function BokettoRoot() {
-  return (
-    <LanguageProvider>
-      <BokettoApp />
-    </LanguageProvider>
+// ============================================================================
+// PUBLIC STOREFRONT — no admin surfaces, no staff links
+// ============================================================================
+
+type DraftLine = OrderLine;
+
+function PublicStorefront() {
+  const { products, createOrder } = useStore();
+  const [cat, setCat] = useState<Category>("bokematchas");
+  const [drawerFor, setDrawerFor] = useState<Product | null>(null);
+  const [cart, setCart] = useState<DraftLine[]>([]);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [checkout, setCheckout] = useState<{ name: string; table: string } | null>(null);
+  const [confirmed, setConfirmed] = useState<{ ref: string; name: string } | null>(null);
+
+  const specials = useMemo(() => products.filter((p) => p.featured), [products]);
+  const regulars = useMemo(() => products.filter((p) => p.regular), [products]);
+  const catalog = useMemo(() => products.filter((p) => p.category === cat), [products, cat]);
+
+  const cartCount = cart.reduce((n, l) => n + l.qty, 0);
+  const cartTotal = cart.reduce(
+    (s, l) => s + (l.price + l.modifiers.reduce((m, x) => m + x.price, 0)) * l.qty,
+    0,
   );
-}
 
-type Modifier = { id: string; label: string; price: number };
-type Category = "cafeteria" | "reposteria" | "brunch";
-type Product = {
-  id: string;
-  name: string;
-  origin: string;
-  desc: string;
-  price: number;
-  category: Category;
-  modifiers?: Modifier[];
-};
+  const addLine = (line: DraftLine) => {
+    setCart((prev) => [...prev, line]);
+    setDrawerFor(null);
+    setCartOpen(true);
+  };
 
-const CATS: { id: Category; labelKey: "cat_cafeteria" | "cat_reposteria" | "cat_brunch"; subKey: "cat_cafeteria_sub" | "cat_reposteria_sub" | "cat_brunch_sub" }[] = [
-  { id: "cafeteria", labelKey: "cat_cafeteria", subKey: "cat_cafeteria_sub" },
-  { id: "reposteria", labelKey: "cat_reposteria", subKey: "cat_reposteria_sub" },
-  { id: "brunch", labelKey: "cat_brunch", subKey: "cat_brunch_sub" },
-];
-
-const INITIAL_PRODUCTS: Product[] = [
-  {
-    id: "flat-white",
-    name: "Flat White",
-    origin: "Etiopía Sidamo",
-    desc: "Doble shot ristretto sobre leche emulsionada sedosa de una sola pasada. Textura microespuma.",
-    price: 3.2,
-    category: "cafeteria",
-    modifiers: [{ id: "oat", label: "Leche de avena barista", price: 0.4 }],
-  },
-  {
-    id: "v60",
-    name: "V60 Origami",
-    origin: "Etiopía Guji · lavado",
-    desc: "Filtrado artesanal en cerámica, 15g / 250ml. Notas florales, cítricas y té negro al final.",
-    price: 4.5,
-    category: "cafeteria",
-  },
-  {
-    id: "iced-v60",
-    name: "Iced V60",
-    origin: "Colombia Huila · natural",
-    desc: "Filtrado sobre hielo. Cuerpo limpio, acidez balanceada, retrogusto a frutos rojos.",
-    price: 4.8,
-    category: "cafeteria",
-  },
-  {
-    id: "matcha",
-    name: "Green Flag Matcha",
-    origin: "Uji, Kioto",
-    desc: "Matcha ceremonial batido a mano. Notas vegetales, umami largo, sin dulzor añadido.",
-    price: 3.8,
-    category: "cafeteria",
-    modifiers: [{ id: "oat", label: "Leche de avena barista", price: 0.4 }],
-  },
-  {
-    id: "pistacho-rosas",
-    name: "Bizcocho de Pistacho",
-    origin: "Con agua de rosas de Damasco",
-    desc: "Bizcocho húmedo de pistacho siciliano, perfumado con agua de rosas. Glaseado mate.",
-    price: 4.5,
-    category: "reposteria",
-    modifiers: [{ id: "crunch", label: "Extra crujiente de pistacho", price: 0.5 }],
-  },
-  {
-    id: "brioche-pistacho",
-    name: "Brioche de Pistacho",
-    origin: "Fermentación 24h · masa madre",
-    desc: "Brioche laminado relleno al momento de crema de pistacho. Servir templado.",
-    price: 3.9,
-    category: "reposteria",
-  },
-  {
-    id: "croissant",
-    name: "Croissant de Mantequilla",
-    origin: "Beurre AOP Charentes",
-    desc: "Laminado a tres vueltas, 72 capas. Corteza fina, miga aireada, aroma a mantequilla noisette.",
-    price: 2.8,
-    category: "reposteria",
-  },
-  {
-    id: "pain-choc",
-    name: "Pain au Chocolat",
-    origin: "Chocolate Valrhona 70%",
-    desc: "Dos barras de chocolate negro dentro de masa laminada. Crujiente por fuera, tierno dentro.",
-    price: 3.5,
-    category: "reposteria",
-  },
-  {
-    id: "tostada",
-    name: "Tostada de Aguacate",
-    origin: "Pan de masa madre 48h",
-    desc: "Aguacate, aceite de oliva virgen extra picual, ralladura de limón, escamas de sal.",
-    price: 8.5,
-    category: "brunch",
-    modifiers: [
-      { id: "egg", label: "Huevo poché", price: 1.5 },
-      { id: "salmon", label: "Salmón noruego marinado", price: 3.5 },
-    ],
-  },
-  {
-    id: "granola",
-    name: "Granola de la Casa",
-    origin: "Con yogur griego colado",
-    desc: "Avena tostada con miel de azahar, frutos secos, semillas y frutas de temporada.",
-    price: 6.9,
-    category: "brunch",
-  },
-];
-
-type BasketLine = { productId: string; modifiers: Record<string, boolean> };
-type View = "home" | "carta" | "estado" | "admin";
-
-function BokettoApp() {
-  const [view, setView] = useState<View>("home");
-  const [dark, setDark] = useState(false);
-  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
-  const [soldOut, setSoldOut] = useState<Record<string, boolean>>({});
-  const [basket, setBasket] = useState<BasketLine[]>([]);
-  const [confirmed, setConfirmed] = useState<BasketLine[] | null>(null);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", dark);
-  }, [dark]);
-
-  const totals = useMemo(() => calcTotals(basket, products), [basket, products]);
+  const submitOrder = () => {
+    if (!checkout || cart.length === 0) return;
+    const order = createOrder({ customer: checkout.name, table: checkout.table, lines: cart });
+    setConfirmed({ ref: order.ref, name: checkout.name || "Barra" });
+    setCart([]);
+    setCheckout(null);
+    setCartOpen(false);
+  };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-32 transition-colors">
-      <div key={view} className="animate-rise">
-        {view === "home" && <HomeView onEnter={() => setView("carta")} />}
-        {view === "carta" && (
-          <CartaView
-            products={products}
-            soldOut={soldOut}
-            basket={basket}
-            setBasket={setBasket}
-            onConfirm={() => {
-              setConfirmed(basket);
-              setView("estado");
-            }}
-            totals={totals}
-          />
-        )}
-        {view === "estado" && (
-          <EstadoView
-            lines={confirmed ?? basket}
-            products={products}
-            onBack={() => setView("carta")}
-            onNew={() => {
-              setBasket([]);
-              setConfirmed(null);
-              setView("carta");
-            }}
-          />
-        )}
-        {view === "admin" && (
-          <AdminView
-            products={products}
-            setProducts={setProducts}
-            soldOut={soldOut}
-            setSoldOut={setSoldOut}
-            dark={dark}
-            setDark={setDark}
-          />
-        )}
-      </div>
-      <BottomNav view={view} setView={setView} />
-    </div>
-  );
-}
+    <div className="min-h-screen text-foreground pb-40">
+      <FloatingNav />
 
-/* ============================ HOME =================================== */
-function HomeView({ onEnter }: { onEnter: () => void }) {
-  const t = useT();
-  return (
-    <div>
-      {/* Cinematic hero */}
-      <section className="relative h-[92svh] min-h-[560px] w-full overflow-hidden">
-        <img
-          src={heroImg}
-          alt="Boketto — interior al atardecer"
-          width={1280}
-          height={1600}
-          className="absolute inset-0 h-full w-full object-cover"
+      <Hero />
+
+      <SpecialsCarousel items={specials} onOpen={(p) => setDrawerFor(p)} />
+
+      <RegularsGrid items={regulars} onOpen={(p) => setDrawerFor(p)} />
+
+      <MenuSection cat={cat} setCat={setCat} items={catalog} onOpen={(p) => setDrawerFor(p)} />
+
+      <Footer />
+
+      {drawerFor && (
+        <CustomizerDrawer
+          product={drawerFor}
+          onClose={() => setDrawerFor(null)}
+          onAdd={addLine}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[color:var(--forest)]/40 via-[color:var(--forest)]/20 to-[color:var(--forest)]" />
-        <div className="absolute inset-0 flex flex-col justify-between px-6 sm:px-10 py-10 sm:py-14 max-w-6xl mx-auto text-[color:var(--primary-foreground)]">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-              {t("home_est")}
-            </span>
-            <div className="flex items-center gap-4">
-              <span className="text-[10px] tracking-editorial uppercase opacity-80 hidden sm:inline">
-                {t("home_loc")}
-              </span>
-              <LanguageSwitcher tone="light" />
-            </div>
-          </div>
+      )}
 
-          <div className="animate-rise-slow max-w-2xl">
-            <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)] mb-4">
-              {t("home_eyebrow")}
-            </p>
-            <h1 className="font-serif italic text-6xl sm:text-8xl leading-[0.9]">
-              Boketto
-            </h1>
-            <div className="hairline w-24 my-6" />
-            <p className="font-serif italic text-xl sm:text-2xl max-w-lg leading-snug opacity-95">
-              {t("home_tagline")}
-            </p>
-            <div className="mt-10 flex flex-wrap items-center gap-3">
-              <button
-                onClick={onEnter}
-                className="group inline-flex items-center gap-3 bg-[color:var(--gold)] text-[color:var(--forest)] rounded-full pl-6 pr-3 py-3 text-[10px] tracking-editorial uppercase font-medium hover:bg-[color:var(--primary-foreground)] transition-colors"
-              >
-                {t("home_cta_explore")}
-                <span className="grid place-items-center w-8 h-8 rounded-full bg-[color:var(--forest)] text-[color:var(--gold)] transition-transform group-hover:translate-x-0.5">
-                  →
-                </span>
-              </button>
-              <a
-                href="https://wa.me/34614191802?text=Hola%20Boketto%2C%20quiero%20reservar%20mesa"
-                target="_blank"
-                rel="noreferrer"
-                className="text-[10px] tracking-editorial uppercase border-b border-[color:var(--gold)]/60 pb-1 hover:border-[color:var(--gold)]"
-              >
-                {t("home_cta_reserve")}
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      {cartCount > 0 && !checkout && !confirmed && (
+        <CartDrawer
+          open={cartOpen}
+          setOpen={setCartOpen}
+          lines={cart}
+          total={cartTotal}
+          onRemove={(idx) => setCart((prev) => prev.filter((_, i) => i !== idx))}
+          onCheckout={() => setCheckout({ name: "", table: "" })}
+        />
+      )}
 
-      {/* Manifiesto */}
-      <section className="max-w-3xl mx-auto px-6 sm:px-10 pt-24 pb-16 text-center">
-        <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)] mb-6">
-          {t("home_manifest_eyebrow")}
-        </p>
-        <p className="font-serif italic text-3xl sm:text-4xl leading-tight">
-          {t("home_manifest")}
-        </p>
-        <div className="hairline w-16 mx-auto mt-10" />
-      </section>
+      {checkout && (
+        <CheckoutSheet
+          value={checkout}
+          setValue={setCheckout}
+          total={cartTotal}
+          onSubmit={submitOrder}
+          onCancel={() => setCheckout(null)}
+        />
+      )}
 
-      {/* Two-pillar editorial split */}
-      <section className="max-w-5xl mx-auto px-6 sm:px-10 pb-20 grid md:grid-cols-2 gap-px bg-border">
-        <Pillar eyebrow={t("pillar_01")} title={t("pillar_01_title")} body={t("pillar_01_body")} />
-        <Pillar eyebrow={t("pillar_02")} title={t("pillar_02_title")} body={t("pillar_02_body")} />
-      </section>
-
-      {/* Reserva */}
-      <section className="max-w-3xl mx-auto px-6 sm:px-10 pb-24">
-        <div className="border border-border rounded-3xl p-10 text-center bg-card">
-          <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)] mb-4">
-            {t("reserve_eyebrow")}
-          </p>
-          <h3 className="font-serif italic text-3xl">{t("reserve_title")}</h3>
-          <p className="text-sm text-muted-foreground mt-4 max-w-md mx-auto leading-relaxed">
-            {t("reserve_body")}
-          </p>
-          <a
-            href="https://wa.me/34614191802?text=Hola%20Boketto%2C%20quiero%20reservar%20mesa"
-            target="_blank"
-            rel="noreferrer"
-            className="mt-8 inline-flex items-center gap-2 border border-foreground rounded-full px-6 py-3 text-[10px] tracking-editorial uppercase font-medium hover:bg-foreground hover:text-background transition-colors"
-          >
-            {t("reserve_cta")}
-          </a>
-        </div>
-      </section>
-
-      <p className="text-[10px] tracking-editorial uppercase text-center text-muted-foreground pb-16">
-        {t("footer")}
-      </p>
-    </div>
-  );
-}
-
-function Pillar({ eyebrow, title, body }: { eyebrow: string; title: string; body: string }) {
-  return (
-    <div className="bg-background p-10">
-      <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">{eyebrow}</p>
-      <h3 className="font-serif italic text-3xl mt-4">{title}</h3>
-      <p className="text-sm text-muted-foreground mt-4 leading-relaxed">{body}</p>
-    </div>
-  );
-}
-
-
-/* ============================ CARTA ================================== */
-function CartaView({
-  products,
-  soldOut,
-  basket,
-  setBasket,
-  onConfirm,
-  totals,
-}: {
-  products: Product[];
-  soldOut: Record<string, boolean>;
-  basket: BasketLine[];
-  setBasket: React.Dispatch<React.SetStateAction<BasketLine[]>>;
-  onConfirm: () => void;
-  totals: { count: number; total: number };
-}) {
-  const t = useT();
-  const { lang } = useLang();
-  const [cat, setCat] = useState<Category>("cafeteria");
-  const filtered = products.filter((p) => p.category === cat);
-
-  const addLine = (productId: string) =>
-    setBasket((b) => [...b, { productId, modifiers: {} }]);
-  const removeLine = (idx: number) =>
-    setBasket((b) => b.filter((_, i) => i !== idx));
-  const toggleMod = (idx: number, modId: string) =>
-    setBasket((b) =>
-      b.map((l, i) =>
-        i === idx ? { ...l, modifiers: { ...l.modifiers, [modId]: !l.modifiers[modId] } } : l,
-      ),
-    );
-
-  return (
-    <div className="max-w-2xl mx-auto px-6 sm:px-10 pt-14">
-      <div className="flex justify-end mb-4">
-        <LanguageSwitcher tone="dark" />
-      </div>
-      <header className="text-center">
-        <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-          {t("carta_eyebrow")}
-        </p>
-        <h2 className="font-serif italic text-5xl mt-3">{t("carta_title")}</h2>
-        <div className="hairline w-16 mx-auto mt-6" />
-      </header>
-
-      {/* Category tabs */}
-      <nav className="sticky top-0 z-30 bg-background/90 backdrop-blur pt-8 pb-4 -mx-6 sm:-mx-10 px-6 sm:px-10 mt-8 border-b border-border">
-        <div className="flex justify-between gap-4">
-          {CATS.map((c) => {
-            const active = cat === c.id;
-            return (
-              <button
-                key={c.id}
-                onClick={() => setCat(c.id)}
-                className={`flex-1 text-center pb-2 transition-all ${
-                  active
-                    ? "border-b border-[color:var(--gold)]"
-                    : "border-b border-transparent opacity-40 hover:opacity-70"
-                }`}
-              >
-                <p className={`text-[10px] tracking-editorial uppercase font-medium`}>
-                  {t(c.labelKey)}
-                </p>
-                <p className="font-serif italic text-xs opacity-70 mt-0.5">{t(c.subKey)}</p>
-              </button>
-            );
-          })}
-        </div>
-      </nav>
-
-      {/* Menu list */}
-      <div className="mt-10 space-y-10 animate-rise">
-        {filtered.map((p, i) => {
-          const out = soldOut[p.id];
-          const linesForProduct = basket
-            .map((l, i2) => ({ l, i: i2 }))
-            .filter((x) => x.l.productId === p.id);
-          const count = linesForProduct.length;
-          return (
-            <article
-              key={p.id}
-              className={`group transition-all ${
-                out ? "opacity-30 blur-[1.5px] pointer-events-none select-none" : ""
-              }`}
-            >
-              <div className="flex justify-between items-baseline gap-6">
-                <div className="min-w-0">
-                  <h3 className="font-serif text-2xl leading-tight">{tProduct(p.id, "name", lang, p.name)}</h3>
-                  <p className="font-serif italic text-xs text-[color:var(--gold)] mt-1">
-                    {tProduct(p.id, "origin", lang, p.origin)}
-                  </p>
-                </div>
-                <span className="shrink-0 text-sm tracking-wider tabular-nums text-muted-foreground">
-                  {p.price.toFixed(2)} €
-                </span>
-              </div>
-              <p className="text-[12px] leading-relaxed text-muted-foreground mt-3 max-w-md">
-                {tProduct(p.id, "desc", lang, p.desc)}
-              </p>
-
-              {out ? (
-                <p className="mt-4 text-[10px] tracking-editorial uppercase text-destructive">
-                  {t("sold_out")}
-                </p>
-              ) : (
-                <>
-                  {count > 0 && p.modifiers && p.modifiers.length > 0 && (
-                    <div className="mt-4 space-y-2">
-                      {linesForProduct.map(({ l, i: lineIdx }, n) => (
-                        <div
-                          key={lineIdx}
-                          className="border-l border-[color:var(--gold)]/40 pl-4 py-1 space-y-1.5"
-                        >
-                          <p className="text-[10px] tracking-editorial uppercase text-muted-foreground">
-                            {t("unit")} {n + 1}
-                          </p>
-                          {p.modifiers!.map((m) => (
-                            <label
-                              key={m.id}
-                              className="flex items-center justify-between gap-3 text-xs cursor-pointer group/mod"
-                            >
-                              <span className="flex items-center gap-2">
-                                <input
-                                  type="checkbox"
-                                  checked={!!l.modifiers[m.id]}
-                                  onChange={() => toggleMod(lineIdx, m.id)}
-                                  className="accent-[color:var(--forest)]"
-                                />
-                                <span className="font-serif italic">{tModifier(m.id, lang, m.label)}</span>
-                              </span>
-                              <span className="text-[color:var(--gold)] tabular-nums">
-                                +{m.price.toFixed(2)} €
-                              </span>
-                            </label>
-                          ))}
-                          <button
-                            onClick={() => removeLine(lineIdx)}
-                            className="text-[9px] tracking-editorial uppercase text-destructive hover:underline"
-                          >
-                            {t("remove")}
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="mt-5 flex items-center gap-4">
-                    <button
-                      onClick={() => addLine(p.id)}
-                      className="inline-flex items-center gap-3 border border-foreground rounded-full pl-4 pr-2 py-1.5 text-[10px] tracking-editorial uppercase hover:bg-foreground hover:text-background transition-colors"
-                    >
-                      {t("add")}
-                      <span className="grid place-items-center w-6 h-6 rounded-full border border-current">
-                        +
-                      </span>
-                    </button>
-                    {count > 0 && (
-                      <span className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-                        × {count} {t("in_order")}
-                      </span>
-                    )}
-                  </div>
-                </>
-              )}
-
-              {i < filtered.length - 1 && <div className="hairline w-full mt-10 opacity-40" />}
-            </article>
-          );
-        })}
-      </div>
-
-      {/* Sticky order bar */}
-      {totals.count > 0 && (
-        <div className="fixed left-0 right-0 bottom-24 z-40 px-4 pointer-events-none">
-          <div className="max-w-2xl mx-auto pointer-events-auto animate-rise">
-            <button
-              onClick={onConfirm}
-              className="w-full bg-[color:var(--forest)] text-[color:var(--primary-foreground)] rounded-full pl-6 pr-2 py-2 flex items-center justify-between shadow-2xl hover:scale-[1.01] active:scale-[0.99] transition-transform"
-            >
-              <div className="text-left">
-                <p className="text-[9px] tracking-editorial uppercase text-[color:var(--gold)]">
-                  {totals.count} {totals.count === 1 ? t("units_one") : t("units_many")} · {t("direct_order")}
-                </p>
-                <p className="font-serif italic text-lg leading-tight">
-                  {t("confirm")} · {totals.total.toFixed(2)} €
-                </p>
-              </div>
-              <span className="grid place-items-center w-12 h-12 rounded-full bg-[color:var(--gold)] text-[color:var(--forest)]">
-                →
-              </span>
-            </button>
-          </div>
-        </div>
+      {confirmed && (
+        <ConfirmSheet
+          ref_={confirmed.ref}
+          name={confirmed.name}
+          onDone={() => setConfirmed(null)}
+        />
       )}
     </div>
   );
 }
 
-
-/* ============================ ESTADO ================================= */
-function EstadoView({
-  lines,
-  products,
-  onBack,
-  onNew,
-}: {
-  lines: BasketLine[];
-  products: Product[];
-  onBack: () => void;
-  onNew: () => void;
-}) {
-  const t = useT();
-  const { lang } = useLang();
-  const detail = useMemo(() => buildLineDetail(lines, products, lang), [lines, products, lang]);
-  const total = detail.reduce((s, l) => s + l.total, 0);
-  const orderId = useMemo(
-    () => "BKT-" + Math.floor(100 + Math.random() * 900),
-    [],
-  );
-
-  const waMessage = useMemo(() => {
-    const header = `*BOKETTO — NUEVO PEDIDO*\n_Guillem Sorolla 29, València_\nRef: ${orderId}\n\n`;
-    const body = detail
-      .map(
-        (l) =>
-          `• *${l.name}* — ${l.base.toFixed(2)} €\n` +
-          l.mods.map((m) => `   ↳ ${m.label} (+${m.price.toFixed(2)} €)`).join("\n"),
-      )
-      .join("\n\n");
-    const footer = `\n\n———\n*TOTAL:* ${total.toFixed(2)} €\n_0% comisiones · directo a la barra_`;
-    return header + body + footer;
-  }, [detail, total, orderId]);
-
-  const waUrl = `https://wa.me/34614191802?text=${encodeURIComponent(waMessage)}`;
-
-  if (lines.length === 0) {
-    return (
-      <div className="max-w-md mx-auto px-6 pt-32 text-center animate-rise">
-        <div className="flex justify-end mb-6">
-          <LanguageSwitcher tone="dark" />
-        </div>
-        <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-          {t("no_order_eyebrow")}
-        </p>
-        <h2 className="font-serif italic text-4xl mt-3">{t("no_order_title")}</h2>
-        <p className="text-sm text-muted-foreground mt-4">
-          {t("no_order_body")}
-        </p>
-        <button
-          onClick={onBack}
-          className="mt-8 inline-flex items-center gap-3 border border-foreground rounded-full pl-5 pr-2 py-2 text-[10px] tracking-editorial uppercase hover:bg-foreground hover:text-background transition-colors"
-        >
-          {t("go_menu")}
-          <span className="grid place-items-center w-7 h-7 rounded-full bg-foreground text-background">
-            →
-          </span>
-        </button>
-      </div>
-    );
-  }
-
+// ============================================================================
+// FLOATING GLASS NAV
+// ============================================================================
+function FloatingNav() {
   return (
-    <div className="max-w-md mx-auto px-6 pt-14">
-      <div className="flex justify-end mb-4">
+    <header className="fixed top-4 inset-x-4 z-40 flex justify-center pointer-events-none">
+      <div className="glass shimmer pointer-events-auto flex items-center gap-6 px-5 py-2.5 rounded-full">
+        <span className="font-serif text-lg leading-none tracking-tight">boketto</span>
+        <span className="hidden sm:block h-4 w-px bg-foreground/15" />
+        <span className="hidden sm:block text-[10px] tracking-editorial uppercase text-foreground/60">
+          guillem sorolla 29 · valència
+        </span>
+        <span className="h-4 w-px bg-foreground/15" />
         <LanguageSwitcher tone="dark" />
       </div>
-      <header className="text-center">
-        <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-          {t("ticket_eyebrow")}
-        </p>
-        <h2 className="font-serif italic text-4xl mt-3">{t("ticket_title")}</h2>
-        <div className="hairline w-16 mx-auto mt-6" />
-      </header>
+    </header>
+  );
+}
 
-      {/* Editorial dark ticket */}
-      <div className="mt-10 bg-[color:var(--forest)] text-[color:var(--primary-foreground)] rounded-3xl p-8 ticket-shadow">
-        <div className="flex justify-between items-start mb-8">
+// ============================================================================
+// HERO
+// ============================================================================
+function Hero() {
+  return (
+    <section className="relative min-h-[92svh] flex flex-col items-center justify-center px-6 pt-32 pb-24 text-center overflow-hidden">
+      <div className="absolute inset-0 -z-10 pointer-events-none">
+        <div className="absolute inset-0 opacity-[0.06]" style={{
+          backgroundImage: "radial-gradient(circle at 20% 30%, var(--forest) 1px, transparent 1px), radial-gradient(circle at 80% 60%, var(--forest) 1px, transparent 1px)",
+          backgroundSize: "44px 44px, 66px 66px",
+        }} />
+      </div>
+
+      <div className="animate-rise">
+        <p className="text-[10px] tracking-editorial uppercase text-foreground/50">
+          Specialty Coffee · Artisan Pastries · All-Day Brunch
+        </p>
+        <div className="hairline w-16 mx-auto mt-6" />
+      </div>
+
+      <h1 className="mt-10 font-serif italic text-5xl sm:text-6xl md:text-7xl leading-[1.02] tracking-tight max-w-4xl animate-rise-slow">
+        Mirar a la nada
+        <br />
+        <span className="text-foreground/80">y que te sepa a Boketto.</span>
+      </h1>
+
+      <p className="mt-8 max-w-md text-sm leading-relaxed text-foreground/65 animate-rise-slow">
+        A small Valencian room where coffee is treated as living matter and pastry as a small edible essay.
+      </p>
+
+      <div className="mt-12 flex flex-wrap items-center justify-center gap-3 animate-rise-slow">
+        <a
+          href="#menu"
+          className="glass-dark shimmer press rounded-full px-7 py-3 text-xs tracking-editorial uppercase"
+        >
+          Explore the menu
+        </a>
+        <a
+          href="https://wa.me/34614191802?text=Hola%20Boketto%2C%20me%20gustar%C3%ADa%20reservar%20mesa."
+          target="_blank"
+          rel="noreferrer"
+          className="glass shimmer press rounded-full px-7 py-3 text-xs tracking-editorial uppercase"
+        >
+          Book a table →
+        </a>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// TODAY'S SPECIALS CAROUSEL
+// ============================================================================
+function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Product) => void }) {
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  if (items.length === 0) return null;
+
+  return (
+    <section className="px-4 sm:px-8 py-16">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-end justify-between mb-8 px-2">
           <div>
-            <p className="text-[9px] tracking-editorial uppercase text-[color:var(--gold)] mb-1">
-              {t("ticket_active")}
+            <p className="text-[10px] tracking-editorial uppercase text-foreground/55">
+              Today's Specials
             </p>
-            <h3 className="font-serif italic text-3xl leading-none">Boketto</h3>
-            <p className="text-[10px] opacity-60 mt-2">Guillem Sorolla 29 · València</p>
+            <h2 className="mt-3 font-serif text-3xl sm:text-4xl italic">Signature del día</h2>
           </div>
-          <div className="text-right">
-            <p className="text-[9px] tracking-editorial uppercase opacity-60">{t("order")}</p>
-            <p className="font-serif text-xl mt-1">#{orderId}</p>
+          <div className="hidden sm:flex gap-2">
+            <button
+              onClick={() => scrollerRef.current?.scrollBy({ left: -320, behavior: "smooth" })}
+              className="glass press rounded-full w-10 h-10 grid place-items-center text-lg"
+              aria-label="Previous"
+            >
+              ‹
+            </button>
+            <button
+              onClick={() => scrollerRef.current?.scrollBy({ left: 320, behavior: "smooth" })}
+              className="glass press rounded-full w-10 h-10 grid place-items-center text-lg"
+              aria-label="Next"
+            >
+              ›
+            </button>
           </div>
         </div>
 
-        <div className="space-y-4 border-y border-white/10 py-6">
-          {detail.map((l, i) => (
-            <div key={i}>
-              <div className="flex justify-between items-baseline">
-                <span className="font-serif italic text-lg pr-2 leading-tight">
-                  1× {l.name}
-                </span>
-                <span className="text-xs tabular-nums opacity-90">
-                  {l.base.toFixed(2)} €
-                </span>
-              </div>
-              {l.mods.map((m, mi) => (
-                <div
-                  key={mi}
-                  className="flex justify-between text-[11px] pl-4 mt-1 opacity-70"
-                >
-                  <span>↳ {m.label}</span>
-                  <span className="tabular-nums">+{m.price.toFixed(2)} €</span>
+        <div
+          ref={scrollerRef}
+          className="no-scrollbar flex gap-5 overflow-x-auto snap-x snap-mandatory pb-4"
+        >
+          {items.map((p) => (
+            <button
+              key={p.id}
+              onClick={() => !p.soldOut && onOpen(p)}
+              disabled={p.soldOut}
+              className={`snap-start shrink-0 w-[82%] sm:w-[380px] text-left group ${p.soldOut ? "opacity-40 blur-[1px] pointer-events-none" : ""}`}
+            >
+              <div className="glass-strong shimmer press rounded-[28px] p-6 h-full transition-transform group-hover:-translate-y-1">
+                <div className="aspect-[4/3] rounded-2xl mb-5 relative overflow-hidden"
+                  style={{ background: "linear-gradient(135deg, color-mix(in oklab, var(--gold) 25%, transparent), color-mix(in oklab, var(--forest) 30%, transparent))" }}>
+                  <div className="absolute inset-0 opacity-40" style={{
+                    backgroundImage: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), transparent 45%)"
+                  }} />
+                  <span className="absolute top-3 left-3 text-[9px] tracking-editorial uppercase glass rounded-full px-2.5 py-1">
+                    signature
+                  </span>
                 </div>
-              ))}
-            </div>
+                <div className="flex items-baseline justify-between gap-4">
+                  <h3 className="font-serif text-2xl leading-tight">{p.name}</h3>
+                  <span className="font-serif text-xl text-foreground/70">€{p.price.toFixed(2)}</span>
+                </div>
+                <p className="mt-1 text-[10px] tracking-editorial uppercase text-foreground/50">{p.origin}</p>
+                <p className="mt-3 text-sm text-foreground/70 leading-relaxed line-clamp-3">{p.desc}</p>
+              </div>
+            </button>
           ))}
         </div>
-
-        <div className="flex justify-between items-center mt-6">
-          <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--gold)] animate-pulse" />
-            <span className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-              {t("at_bar")}
-            </span>
-          </div>
-          <span className="font-serif italic text-3xl">{total.toFixed(2)} €</span>
-        </div>
       </div>
-
-      {/* WhatsApp CTA */}
-      <a
-        href={waUrl}
-        target="_blank"
-        rel="noreferrer"
-        className="mt-6 flex items-center justify-between w-full bg-foreground text-background rounded-full pl-6 pr-2 py-2 shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-transform"
-      >
-        <div className="text-left">
-          <p className="text-[9px] tracking-editorial uppercase text-[color:var(--gold)]">
-            {t("no_fees")}
-          </p>
-          <p className="font-serif italic text-base leading-tight">{t("send_wa")}</p>
-        </div>
-        <span className="grid place-items-center w-11 h-11 rounded-full bg-[color:var(--gold)] text-[color:var(--forest)]">
-          →
-        </span>
-      </a>
-
-      <div className="mt-4 grid grid-cols-2 gap-2">
-        <button
-          onClick={onBack}
-          className="border border-border rounded-full py-3 text-[10px] tracking-editorial uppercase hover:border-foreground transition-colors"
-        >
-          {t("edit")}
-        </button>
-        <button
-          onClick={onNew}
-          className="border border-border rounded-full py-3 text-[10px] tracking-editorial uppercase hover:border-foreground transition-colors"
-        >
-          {t("new_ticket")}
-        </button>
-      </div>
-    </div>
+    </section>
   );
 }
 
-/* ============================ ADMIN ================================== */
-function AdminView({
-  products,
-  setProducts,
-  soldOut,
-  setSoldOut,
-  dark,
-  setDark,
-}: {
-  products: Product[];
-  setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
-  soldOut: Record<string, boolean>;
-  setSoldOut: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-  dark: boolean;
-  setDark: (v: boolean) => void;
-}) {
-  const t = useT();
-  const { lang } = useLang();
+// ============================================================================
+// REGULARS
+// ============================================================================
+function RegularsGrid({ items, onOpen }: { items: Product[]; onOpen: (p: Product) => void }) {
+  if (items.length === 0) return null;
   return (
-    <div className="max-w-2xl mx-auto px-6 sm:px-10 pt-14">
-      <div className="flex justify-end mb-4">
-        <LanguageSwitcher tone="dark" />
-      </div>
-      <header className="text-center">
-        <p className="text-[10px] tracking-editorial uppercase text-[color:var(--gold)]">
-          {t("admin_eyebrow")}
-        </p>
-        <h2 className="font-serif italic text-4xl mt-3">{t("admin_title")}</h2>
-        <div className="hairline w-16 mx-auto mt-6" />
-      </header>
-
-      {/* Dark mode toggle */}
-      <div className="mt-10 border border-border rounded-2xl p-6 flex items-center justify-between gap-4">
-        <div className="min-w-0">
-          <p className="font-serif italic text-xl">{t("night_mode")}</p>
-          <p className="text-[11px] text-muted-foreground mt-1">
-            {t("night_mode_body")}
-          </p>
+    <section className="px-4 sm:px-8 py-12">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-end justify-between mb-6 px-2">
+          <div>
+            <p className="text-[10px] tracking-editorial uppercase text-foreground/55">The Regulars</p>
+            <h2 className="mt-3 font-serif text-2xl italic">Daily staples · quick tap</h2>
+          </div>
         </div>
-        <button
-          onClick={() => setDark(!dark)}
-          aria-label="Toggle dark mode"
-          className={`relative shrink-0 w-16 h-8 rounded-full transition-colors ${
-            dark ? "bg-[color:var(--gold)]" : "bg-muted"
-          }`}
-        >
-          <span
-            className={`absolute top-1 left-1 w-6 h-6 rounded-full bg-background border border-border transition-transform ${
-              dark ? "translate-x-8" : ""
-            }`}
-          />
-        </button>
-      </div>
-
-      {/* Product rows */}
-      <div className="mt-8 space-y-px bg-border rounded-2xl overflow-hidden border border-border">
-        {products.map((p) => {
-          const out = soldOut[p.id];
-          return (
-            <div
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {items.map((p) => (
+            <button
               key={p.id}
-              className="bg-background p-5 grid grid-cols-[minmax(0,1fr)_auto] gap-4 items-center"
+              onClick={() => !p.soldOut && onOpen(p)}
+              disabled={p.soldOut}
+              className={`glass shimmer press rounded-2xl p-4 text-left transition-transform hover:-translate-y-0.5 ${p.soldOut ? "opacity-40 blur-[1px] pointer-events-none" : ""}`}
             >
-              <div className="min-w-0">
-                <p className="font-serif text-lg truncate">{tProduct(p.id, "name", lang, p.name)}</p>
-                <p className="font-serif italic text-[11px] text-[color:var(--gold)] truncate">
-                  {tProduct(p.id, "origin", lang, p.origin)}
-                </p>
-                <div className="mt-3 flex items-center gap-2">
-                  <label className="text-[9px] tracking-editorial uppercase text-muted-foreground">
-                    {t("price_eur")}
-                  </label>
-                  <input
-                    type="number"
-                    step="0.10"
-                    value={p.price}
-                    onChange={(e) =>
-                      setProducts((arr) =>
-                        arr.map((x) =>
-                          x.id === p.id
-                            ? { ...x, price: parseFloat(e.target.value) || 0 }
-                            : x,
-                        ),
-                      )
-                    }
-                    className="w-20 bg-transparent border-b border-border tabular-nums text-sm py-1 focus:outline-none focus:border-[color:var(--gold)]"
-                  />
-                </div>
+              <div className="flex items-center justify-between">
+                <span className="font-serif text-base leading-tight">{p.name}</span>
+                <span className="text-xs text-foreground/60">€{p.price.toFixed(2)}</span>
               </div>
+              <p className="mt-1 text-[9px] tracking-editorial uppercase text-foreground/45 line-clamp-1">{p.origin}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// MENU
+// ============================================================================
+function MenuSection({
+  cat, setCat, items, onOpen,
+}: {
+  cat: Category; setCat: (c: Category) => void; items: Product[]; onOpen: (p: Product) => void;
+}) {
+  const cats: Category[] = ["bokematchas", "coffee", "bakery", "brunch"];
+  return (
+    <section id="menu" className="px-4 sm:px-8 py-16">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-10">
+          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">The Menu</p>
+          <h2 className="mt-3 font-serif text-4xl sm:text-5xl italic">La carta</h2>
+          <div className="hairline w-16 mx-auto mt-6" />
+        </div>
+
+        {/* Tab bar */}
+        <div className="glass rounded-full p-1.5 inline-flex flex-wrap gap-1 mx-auto mb-10 sticky top-20 z-30" style={{ display: "flex" }}>
+          {cats.map((c) => {
+            const active = c === cat;
+            return (
               <button
-                onClick={() => setSoldOut((s) => ({ ...s, [p.id]: !s[p.id] }))}
-                className={`shrink-0 text-[10px] tracking-editorial uppercase rounded-full px-4 py-2.5 transition-colors ${
-                  out
-                    ? "bg-destructive text-destructive-foreground"
-                    : "border border-foreground hover:bg-foreground hover:text-background"
+                key={c}
+                onClick={() => setCat(c)}
+                className={`glass-tab shimmer press rounded-full px-5 py-2.5 text-[10px] tracking-editorial uppercase transition-all ${
+                  active ? "glass-dark" : "bg-transparent border-transparent"
                 }`}
               >
-                {out ? t("agotado") : t("available")}
+                {CATEGORY_META[c].label}
               </button>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
 
-      <p className="text-[10px] tracking-editorial uppercase text-muted-foreground text-center mt-10">
-        {t("pos_footer")}
+        <div className="grid sm:grid-cols-2 gap-4">
+          {items.map((p) => (
+            <button
+              key={p.id}
+              onClick={() => !p.soldOut && onOpen(p)}
+              disabled={p.soldOut}
+              className={`glass shimmer press text-left rounded-3xl p-6 transition-all hover:-translate-y-0.5 ${p.soldOut ? "opacity-40 blur-[1px] pointer-events-none" : ""}`}
+            >
+              <div className="flex items-baseline justify-between gap-4">
+                <h3 className="font-serif text-xl leading-tight">{p.name}</h3>
+                <span className="font-serif text-lg text-foreground/70">€{p.price.toFixed(2)}</span>
+              </div>
+              <p className="mt-1 text-[9px] tracking-editorial uppercase text-foreground/45">{p.origin}</p>
+              <p className="mt-3 text-sm text-foreground/65 leading-relaxed">{p.desc}</p>
+              {p.modifiers && p.modifiers.length > 0 && (
+                <p className="mt-3 text-[10px] tracking-editorial uppercase text-foreground/45">
+                  {p.modifiers.length} option{p.modifiers.length > 1 ? "s" : ""}
+                </p>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// FOOTER
+// ============================================================================
+function Footer() {
+  return (
+    <footer className="px-6 py-16 text-center">
+      <div className="hairline w-16 mx-auto mb-6" />
+      <p className="font-serif text-lg italic">boketto</p>
+      <p className="mt-2 text-[10px] tracking-editorial uppercase text-foreground/50">
+        guillem sorolla 29 · valència · es
       </p>
+      <p className="mt-1 text-[10px] tracking-editorial uppercase text-foreground/40">
+        est · 2021
+      </p>
+    </footer>
+  );
+}
+
+// ============================================================================
+// CUSTOMIZER DRAWER
+// ============================================================================
+function CustomizerDrawer({
+  product, onClose, onAdd,
+}: {
+  product: Product; onClose: () => void; onAdd: (l: DraftLine) => void;
+}) {
+  const [milk, setMilk] = useState<string>("");
+  const [dietary, setDietary] = useState<Record<string, boolean>>({});
+  const [qty, setQty] = useState(1);
+
+  const milkOpts = (product.modifiers ?? []).filter((m) => m.group === "milk");
+  const dietOpts = (product.modifiers ?? []).filter((m) => m.group === "diet");
+  const otherOpts = (product.modifiers ?? []).filter((m) => !m.group);
+  const [others, setOthers] = useState<Record<string, boolean>>({});
+
+  const chosen: Modifier[] = [
+    ...(milk ? [milkOpts.find((m) => m.id === milk)!].filter(Boolean) : []),
+    ...dietOpts.filter((m) => dietary[m.id]),
+    ...otherOpts.filter((m) => others[m.id]),
+  ];
+  const unit = product.price + chosen.reduce((s, m) => s + m.price, 0);
+  const total = unit * qty;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 animate-rise">
+      <button
+        aria-label="Close"
+        onClick={onClose}
+        className="absolute inset-0 bg-foreground/20 backdrop-blur-sm"
+      />
+      <div className="glass-strong relative w-full sm:max-w-lg rounded-t-[32px] sm:rounded-[32px] p-7 max-h-[85svh] overflow-y-auto">
+        <div className="mx-auto h-1 w-10 rounded-full bg-foreground/15 sm:hidden mb-5" />
+        <p className="text-[10px] tracking-editorial uppercase text-foreground/50">Customize</p>
+        <h3 className="mt-2 font-serif text-3xl">{product.name}</h3>
+        <p className="mt-1 text-[10px] tracking-editorial uppercase text-foreground/45">{product.origin}</p>
+        <p className="mt-4 text-sm text-foreground/70 leading-relaxed">{product.desc}</p>
+
+        {milkOpts.length > 0 && (
+          <div className="mt-6">
+            <p className="text-[10px] tracking-editorial uppercase text-foreground/55 mb-3">Milk</p>
+            <div className="grid grid-cols-3 gap-2">
+              {milkOpts.map((m) => (
+                <button
+                  key={m.id}
+                  onClick={() => setMilk(m.id === milk ? "" : m.id)}
+                  className={`glass shimmer press rounded-2xl py-3 text-xs transition-all ${
+                    milk === m.id ? "glass-dark" : ""
+                  }`}
+                >
+                  <div className="font-medium">{m.label.replace(" milk", "")}</div>
+                  {m.price > 0 && <div className="text-[10px] opacity-70 mt-0.5">+€{m.price.toFixed(2)}</div>}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {dietOpts.length > 0 && (
+          <div className="mt-5">
+            <p className="text-[10px] tracking-editorial uppercase text-foreground/55 mb-3">Dietary</p>
+            <div className="flex flex-wrap gap-2">
+              {dietOpts.map((m) => (
+                <label key={m.id} className={`glass press shimmer rounded-full px-4 py-2 text-xs cursor-pointer ${dietary[m.id] ? "glass-dark" : ""}`}>
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    checked={!!dietary[m.id]}
+                    onChange={(e) => setDietary((d) => ({ ...d, [m.id]: e.target.checked }))}
+                  />
+                  {m.label} {m.price > 0 && <span className="opacity-70">+€{m.price.toFixed(2)}</span>}
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {otherOpts.length > 0 && (
+          <div className="mt-5">
+            <p className="text-[10px] tracking-editorial uppercase text-foreground/55 mb-3">Add-ons</p>
+            <div className="flex flex-wrap gap-2">
+              {otherOpts.map((m) => (
+                <label key={m.id} className={`glass press shimmer rounded-full px-4 py-2 text-xs cursor-pointer ${others[m.id] ? "glass-dark" : ""}`}>
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    checked={!!others[m.id]}
+                    onChange={(e) => setOthers((d) => ({ ...d, [m.id]: e.target.checked }))}
+                  />
+                  {m.label} {m.price > 0 && <span className="opacity-70">+€{m.price.toFixed(2)}</span>}
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-7 flex items-center justify-between">
+          <div className="glass rounded-full inline-flex items-center gap-1 p-1">
+            <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="press w-9 h-9 rounded-full text-lg">−</button>
+            <span className="w-8 text-center text-sm font-medium">{qty}</span>
+            <button onClick={() => setQty((q) => q + 1)} className="press w-9 h-9 rounded-full text-lg">+</button>
+          </div>
+          <div className="text-right">
+            <p className="text-[10px] tracking-editorial uppercase text-foreground/50">Subtotal</p>
+            <p className="font-serif text-2xl">€{total.toFixed(2)}</p>
+          </div>
+        </div>
+
+        <button
+          onClick={() =>
+            onAdd({
+              id: `l_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              productId: product.id,
+              name: product.name,
+              price: product.price,
+              modifiers: chosen.map((m) => ({ id: m.id, label: m.label, price: m.price })),
+              qty,
+            })
+          }
+          className="mt-6 w-full glass-dark shimmer press rounded-full py-4 text-xs tracking-editorial uppercase"
+        >
+          Add to order · €{total.toFixed(2)}
+        </button>
+      </div>
     </div>
   );
 }
 
-/* ============================ NAV ==================================== */
-function BottomNav({ view, setView }: { view: View; setView: (v: View) => void }) {
-  const t = useT();
-  const items: { id: View; labelKey: "nav_home" | "nav_carta" | "nav_estado" | "nav_admin" }[] = [
-    { id: "home", labelKey: "nav_home" },
-    { id: "carta", labelKey: "nav_carta" },
-    { id: "estado", labelKey: "nav_estado" },
-    { id: "admin", labelKey: "nav_admin" },
-  ];
+// ============================================================================
+// CART DRAWER
+// ============================================================================
+function CartDrawer({
+  open, setOpen, lines, total, onRemove, onCheckout,
+}: {
+  open: boolean;
+  setOpen: (v: boolean) => void;
+  lines: DraftLine[];
+  total: number;
+  onRemove: (idx: number) => void;
+  onCheckout: () => void;
+}) {
+  const count = lines.reduce((n, l) => n + l.qty, 0);
   return (
-    <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[min(94%,26rem)]">
-      <div className="bg-[color:var(--forest)] text-[color:var(--primary-foreground)] rounded-full px-3 py-2 flex items-center justify-between shadow-2xl backdrop-blur">
-        {items.map((it) => {
-          const active = view === it.id;
-          return (
-            <button
-              key={it.id}
-              onClick={() => setView(it.id)}
-              className={`flex-1 py-2 rounded-full text-[10px] tracking-editorial uppercase transition-all ${
-                active
-                  ? "bg-[color:var(--gold)] text-[color:var(--forest)] font-medium"
-                  : "opacity-60 hover:opacity-100"
-              }`}
-            >
-              {t(it.labelKey)}
-            </button>
-          );
-        })}
+    <div className={`fixed inset-x-0 bottom-0 z-40 pointer-events-none`}>
+      <div className={`mx-auto max-w-2xl px-4 pb-4 pointer-events-auto transition-transform duration-500 ${open ? "translate-y-0" : "translate-y-[calc(100%-84px)]"}`}>
+        <div className="glass-strong rounded-[32px] overflow-hidden">
+          <button
+            onClick={() => setOpen(!open)}
+            className="w-full flex items-center justify-between px-6 py-5 press"
+          >
+            <div className="flex items-center gap-3">
+              <span className="glass-dark rounded-full w-10 h-10 grid place-items-center text-xs font-medium">
+                {count}
+              </span>
+              <div className="text-left">
+                <p className="text-[10px] tracking-editorial uppercase text-foreground/55">Your order</p>
+                <p className="font-serif text-lg">€{total.toFixed(2)}</p>
+              </div>
+            </div>
+            <span className="text-[10px] tracking-editorial uppercase text-foreground/60">
+              {open ? "Collapse ▾" : "Expand ▴"}
+            </span>
+          </button>
+
+          {open && (
+            <div className="px-6 pb-6 max-h-[50svh] overflow-y-auto">
+              <div className="hairline mb-4" />
+              <ul className="space-y-3">
+                {lines.map((l, i) => {
+                  const lineTotal = (l.price + l.modifiers.reduce((s, m) => s + m.price, 0)) * l.qty;
+                  return (
+                    <li key={l.id} className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-serif text-base leading-tight">
+                          <span className="text-foreground/50 text-sm mr-1">{l.qty}×</span>{l.name}
+                        </p>
+                        {l.modifiers.length > 0 && (
+                          <p className="text-[10px] text-foreground/50 mt-0.5">
+                            {l.modifiers.map((m) => m.label).join(" · ")}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-sm">€{lineTotal.toFixed(2)}</p>
+                        <button
+                          onClick={() => onRemove(i)}
+                          className="text-[10px] tracking-editorial uppercase text-foreground/40 hover:text-destructive"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+              <button
+                onClick={onCheckout}
+                className="mt-6 w-full glass-dark shimmer press rounded-full py-4 text-xs tracking-editorial uppercase"
+              >
+                Checkout · €{total.toFixed(2)}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-    </nav>
+    </div>
   );
 }
 
+// ============================================================================
+// CHECKOUT
+// ============================================================================
+function CheckoutSheet({
+  value, setValue, total, onSubmit, onCancel,
+}: {
+  value: { name: string; table: string };
+  setValue: (v: { name: string; table: string }) => void;
+  total: number;
+  onSubmit: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 animate-rise">
+      <button aria-label="Close" onClick={onCancel} className="absolute inset-0 bg-foreground/20 backdrop-blur-sm" />
+      <div className="glass-strong relative w-full sm:max-w-md rounded-t-[32px] sm:rounded-[32px] p-8">
+        <p className="text-[10px] tracking-editorial uppercase text-foreground/55">Checkout</p>
+        <h3 className="mt-2 font-serif text-3xl">Almost yours</h3>
+        <p className="mt-2 text-sm text-foreground/60">Pickup at the bar or drop-off at your table.</p>
 
-/* ============================ HELPERS ================================ */
-function calcTotals(basket: BasketLine[], products: Product[]) {
-  let total = 0;
-  for (const line of basket) {
-    const p = products.find((x) => x.id === line.productId);
-    if (!p) continue;
-    total += p.price;
-    for (const m of p.modifiers ?? []) if (line.modifiers[m.id]) total += m.price;
-  }
-  return { count: basket.length, total };
+        <div className="mt-6 space-y-3">
+          <label className="block">
+            <span className="text-[10px] tracking-editorial uppercase text-foreground/55">Name</span>
+            <input
+              autoFocus
+              value={value.name}
+              onChange={(e) => setValue({ ...value, name: e.target.value })}
+              placeholder="e.g. María"
+              className="mt-1 w-full glass rounded-2xl px-4 py-3 text-sm bg-white/50 focus:outline-none focus:ring-2 focus:ring-[color:var(--gold)]"
+            />
+          </label>
+          <label className="block">
+            <span className="text-[10px] tracking-editorial uppercase text-foreground/55">Table (or leave blank for bar)</span>
+            <input
+              value={value.table}
+              onChange={(e) => setValue({ ...value, table: e.target.value })}
+              placeholder="e.g. 4"
+              className="mt-1 w-full glass rounded-2xl px-4 py-3 text-sm bg-white/50 focus:outline-none focus:ring-2 focus:ring-[color:var(--gold)]"
+            />
+          </label>
+        </div>
+
+        <div className="mt-6 flex items-center justify-between">
+          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">Total</p>
+          <p className="font-serif text-2xl">€{total.toFixed(2)}</p>
+        </div>
+
+        <button
+          onClick={onSubmit}
+          className="mt-6 w-full glass-dark shimmer press rounded-full py-4 text-xs tracking-editorial uppercase"
+        >
+          Send to bar
+        </button>
+        <button
+          onClick={onCancel}
+          className="mt-2 w-full text-[10px] tracking-editorial uppercase text-foreground/50 py-2"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
 }
 
-function buildLineDetail(basket: BasketLine[], products: Product[], lang: import("../lib/i18n").Lang) {
-  return basket.map((line) => {
-    const p = products.find((x) => x.id === line.productId)!;
-    const mods = (p.modifiers ?? []).filter((m) => line.modifiers[m.id]).map((m) => ({
-      ...m,
-      label: tModifier(m.id, lang, m.label),
-    }));
-    const total = p.price + mods.reduce((s, m) => s + m.price, 0);
-    return { name: tProduct(p.id, "name", lang, p.name), base: p.price, mods, total };
-  });
+// ============================================================================
+// CONFIRM
+// ============================================================================
+function ConfirmSheet({ ref_, name, onDone }: { ref_: string; name: string; onDone: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 6000);
+    return () => clearTimeout(t);
+  }, [onDone]);
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 animate-rise">
+      <button aria-label="Close" onClick={onDone} className="absolute inset-0 bg-foreground/20 backdrop-blur-sm" />
+      <div className="glass-strong relative w-full max-w-sm rounded-[32px] p-8 text-center">
+        <div className="mx-auto w-16 h-16 rounded-full glass-dark grid place-items-center animate-pulse-ring">
+          <span className="text-[color:var(--gold)] text-2xl">✓</span>
+        </div>
+        <p className="mt-6 text-[10px] tracking-editorial uppercase text-foreground/55">Order received</p>
+        <h3 className="mt-2 font-serif text-3xl">{ref_}</h3>
+        <p className="mt-3 text-sm text-foreground/70">
+          Thank you, <span className="italic">{name}</span>. We're preparing it now.
+        </p>
+        <button
+          onClick={onDone}
+          className="mt-6 w-full glass press rounded-full py-3 text-xs tracking-editorial uppercase"
+        >
+          Done
+        </button>
+      </div>
+    </div>
+  );
 }
