@@ -181,7 +181,8 @@ function Hero() {
       <div className="mt-12 flex flex-wrap items-center justify-center gap-3 animate-rise-slow">
         <a
           href="#menu"
-          className="glass-dark shimmer press rounded-full px-7 py-3 text-xs tracking-editorial uppercase"
+          className="shimmer press rounded-full px-7 py-3 text-xs tracking-editorial uppercase"
+          style={{ backgroundColor: "var(--terracotta)", color: "var(--ivory)" }}
         >
           Explore the menu
         </a>
