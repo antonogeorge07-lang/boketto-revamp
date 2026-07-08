@@ -119,14 +119,29 @@ function PublicStorefront() {
 function FloatingNav() {
   return (
     <header className="fixed top-4 inset-x-4 z-40 flex justify-center pointer-events-none">
-      <div className="glass shimmer pointer-events-auto flex items-center gap-6 px-5 py-2.5 rounded-full">
-        <span className="font-serif text-lg leading-none tracking-tight">boketto</span>
-        <span className="hidden sm:block h-4 w-px bg-foreground/15" />
-        <span className="hidden sm:block text-[10px] tracking-editorial uppercase text-foreground/60">
+      <div
+        className="pointer-events-auto flex items-center gap-4 sm:gap-6 pl-3 pr-2 py-2 rounded-full shimmer"
+        style={{
+          backgroundColor: "color-mix(in oklab, var(--forest) 92%, transparent)",
+          border: "1px solid color-mix(in oklab, var(--ivory) 18%, transparent)",
+          boxShadow: "0 20px 50px -20px rgba(0,0,0,0.4)",
+          color: "var(--ivory)",
+        }}
+      >
+        <BKLogo className="h-8 w-8" tone="ivory" />
+        <span className="hidden sm:block h-4 w-px bg-[color:var(--ivory)]/25" />
+        <span className="hidden md:block text-[10px] tracking-editorial uppercase text-[color:var(--ivory)]/70">
           guillem sorolla 29 · valència
         </span>
-        <span className="h-4 w-px bg-foreground/15" />
+        <span className="hidden sm:block h-4 w-px bg-[color:var(--ivory)]/25" />
         <LanguageSwitcher tone="dark" />
+        <a
+          href="#menu"
+          className="ml-1 press rounded-full px-4 py-2 text-[10px] tracking-editorial uppercase"
+          style={{ backgroundColor: "var(--terracotta)", color: "var(--ivory)" }}
+        >
+          Place your order
+        </a>
       </div>
     </header>
   );
