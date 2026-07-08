@@ -33,32 +33,37 @@
   --color-ring: var(--ring);
   --color-gold: var(--gold);
   --color-forest: var(--forest);
+  --color-terracotta: var(--terracotta);
+  --color-ivory: var(--ivory);
 }
 
 :root {
   --radius: 1.25rem;
-  /* Boketto — Liquid Glass Editorial */
-  --background: oklch(0.978 0.010 88);        /* #FAF8F5 warm off-white */
-  --foreground: oklch(0.20 0.014 155);        /* #1C221F deep forest */
-  --card: oklch(0.99 0.006 88);
-  --card-foreground: oklch(0.20 0.014 155);
-  --popover: oklch(0.99 0.006 88);
-  --popover-foreground: oklch(0.20 0.014 155);
-  --primary: oklch(0.20 0.014 155);           /* #1C221F forest */
-  --primary-foreground: oklch(0.978 0.010 88);
-  --secondary: oklch(0.94 0.010 88);
-  --secondary-foreground: oklch(0.20 0.014 155);
-  --muted: oklch(0.94 0.010 88);
-  --muted-foreground: oklch(0.48 0.014 90);
-  --accent: oklch(0.72 0.075 75);             /* #b89664 antique gold */
-  --accent-foreground: oklch(0.20 0.014 155);
-  --destructive: oklch(0.55 0.20 27);
+  /* Boketto — official palette (from bokettopastry.com) */
+  --background: oklch(0.945 0.038 70);         /* #FCE7CE warm peach cream */
+  --foreground: oklch(0.36 0.028 155);         /* #3E5B47 sage forest ink */
+  --card: oklch(0.965 0.028 72);
+  --card-foreground: oklch(0.36 0.028 155);
+  --popover: oklch(0.965 0.028 72);
+  --popover-foreground: oklch(0.36 0.028 155);
+  --primary: oklch(0.42 0.032 155);            /* #3F5B4B forest header */
+  --primary-foreground: oklch(0.965 0.032 82); /* ivory */
+  --secondary: oklch(0.90 0.030 70);
+  --secondary-foreground: oklch(0.36 0.028 155);
+  --muted: oklch(0.90 0.030 70);
+  --muted-foreground: oklch(0.50 0.020 90);
+  --accent: oklch(0.56 0.145 38);              /* #B54B33 terracotta */
+  --accent-foreground: oklch(0.965 0.032 82);
+  --destructive: oklch(0.56 0.145 38);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.90 0.010 88);
-  --input: oklch(0.91 0.010 88);
-  --ring: oklch(0.72 0.075 75);
+  --border: oklch(0.87 0.028 72);
+  --input: oklch(0.88 0.028 72);
+  --ring: oklch(0.56 0.145 38);
   --gold: oklch(0.72 0.075 75);
-  --forest: oklch(0.20 0.014 155);
+  --forest: oklch(0.42 0.032 155);             /* header green */
+  --forest-deep: oklch(0.28 0.024 155);        /* deeper accent */
+  --terracotta: oklch(0.56 0.145 38);
+  --ivory: oklch(0.965 0.032 82);
   --ash: oklch(0.65 0.008 90);
 }
 
@@ -100,9 +105,9 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     background-image:
-      radial-gradient(1200px 800px at 8% -10%, color-mix(in oklab, var(--gold) 22%, transparent), transparent 60%),
+      radial-gradient(1200px 800px at 8% -10%, color-mix(in oklab, var(--terracotta) 10%, transparent), transparent 60%),
       radial-gradient(900px 700px at 110% 10%, color-mix(in oklab, var(--forest) 14%, transparent), transparent 55%),
-      radial-gradient(1000px 900px at 50% 120%, color-mix(in oklab, var(--gold) 12%, transparent), transparent 55%);
+      radial-gradient(1000px 900px at 50% 120%, color-mix(in oklab, var(--terracotta) 8%, transparent), transparent 55%);
     background-attachment: fixed;
   }
   .font-serif { font-family: var(--font-serif); }

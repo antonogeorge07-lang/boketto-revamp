@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CATEGORY_META, useStore, type Category, type Modifier, type OrderLine, type Product } from "../lib/store";
 import { LanguageSwitcher } from "../lib/i18n";
+import { BKLogo } from "../components/BKLogo";
 import galleryInterior from "../assets/gallery-interior.jpg";
 import galleryMatcha from "../assets/gallery-matcha.jpg";
 import galleryCroissant from "../assets/gallery-croissant.jpg";
@@ -119,14 +120,29 @@ function PublicStorefront() {
 function FloatingNav() {
   return (
     <header className="fixed top-4 inset-x-4 z-40 flex justify-center pointer-events-none">
-      <div className="glass shimmer pointer-events-auto flex items-center gap-6 px-5 py-2.5 rounded-full">
-        <span className="font-serif text-lg leading-none tracking-tight">boketto</span>
-        <span className="hidden sm:block h-4 w-px bg-foreground/15" />
-        <span className="hidden sm:block text-[10px] tracking-editorial uppercase text-foreground/60">
+      <div
+        className="pointer-events-auto flex items-center gap-4 sm:gap-6 pl-3 pr-2 py-2 rounded-full shimmer"
+        style={{
+          backgroundColor: "color-mix(in oklab, var(--forest) 92%, transparent)",
+          border: "1px solid color-mix(in oklab, var(--ivory) 18%, transparent)",
+          boxShadow: "0 20px 50px -20px rgba(0,0,0,0.4)",
+          color: "var(--ivory)",
+        }}
+      >
+        <BKLogo className="h-8 w-8" tone="ivory" />
+        <span className="hidden sm:block h-4 w-px bg-[color:var(--ivory)]/25" />
+        <span className="hidden md:block text-[10px] tracking-editorial uppercase text-[color:var(--ivory)]/70">
           guillem sorolla 29 · valència
         </span>
-        <span className="h-4 w-px bg-foreground/15" />
+        <span className="hidden sm:block h-4 w-px bg-[color:var(--ivory)]/25" />
         <LanguageSwitcher tone="dark" />
+        <a
+          href="#menu"
+          className="ml-1 press rounded-full px-4 py-2 text-[10px] tracking-editorial uppercase"
+          style={{ backgroundColor: "var(--terracotta)", color: "var(--ivory)" }}
+        >
+          Place your order
+        </a>
       </div>
     </header>
   );
@@ -165,7 +181,8 @@ function Hero() {
       <div className="mt-12 flex flex-wrap items-center justify-center gap-3 animate-rise-slow">
         <a
           href="#menu"
-          className="glass-dark shimmer press rounded-full px-7 py-3 text-xs tracking-editorial uppercase"
+          className="shimmer press rounded-full px-7 py-3 text-xs tracking-editorial uppercase"
+          style={{ backgroundColor: "var(--terracotta)", color: "var(--ivory)" }}
         >
           Explore the menu
         </a>
@@ -469,6 +486,7 @@ function Footer() {
   return (
     <footer className="px-6 py-16 text-center">
       <div className="hairline w-16 mx-auto mb-6" />
+      <div className="flex justify-center mb-3"><BKLogo className="h-10 w-10" tone="forest" /></div>
       <p className="font-serif text-lg italic">boketto</p>
       <p className="mt-2 text-[10px] tracking-editorial uppercase text-foreground/50">
         guillem sorolla 29 · valència · es
