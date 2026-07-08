@@ -67,9 +67,9 @@ function PublicStorefront() {
 
       <MenuSection cat={cat} setCat={setCat} items={catalog} onOpen={(p) => setDrawerFor(p)} />
 
-      <Gallery />
+      <GallerySection />
 
-      <Location />
+      <VenueSection />
 
       <Footer />
 
