@@ -486,6 +486,7 @@ function Footer() {
   return (
     <footer className="px-6 py-16 text-center">
       <div className="hairline w-16 mx-auto mb-6" />
+      <div className="flex justify-center mb-3"><BKLogo className="h-10 w-10" tone="forest" /></div>
       <p className="font-serif text-lg italic">boketto</p>
       <p className="mt-2 text-[10px] tracking-editorial uppercase text-foreground/50">
         guillem sorolla 29 · valència · es
