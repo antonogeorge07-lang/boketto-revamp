@@ -2,6 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CATEGORY_META, useStore, type Category, type Modifier, type OrderLine, type Product } from "../lib/store";
 import { LanguageSwitcher } from "../lib/i18n";
+import galleryInterior from "../assets/gallery-interior.jpg";
+import galleryMatcha from "../assets/gallery-matcha.jpg";
+import galleryCroissant from "../assets/gallery-croissant.jpg";
+import galleryPistachio from "../assets/gallery-pistachio.jpg";
+
+const BOKETTO_PASTRY_HERO = "https://bokettopastry.com/wp-content/uploads/2025/12/WhatsApp-Image-2025-12-27-at-12.18.01.jpeg";
+const BOKETTO_SIGNATURE = "https://bokettopastry.com/wp-content/uploads/2025/12/WhatsApp-Image-2025-12-28-at-13.04.17-1024x768.jpeg";
+const MAPS_URL = "https://www.google.com/maps/place/Boketto+Specialty+Coffee/@39.4725533,-0.3824784,17z";
 
 export const Route = createFileRoute("/")({
   component: PublicStorefront,
@@ -58,6 +66,10 @@ function PublicStorefront() {
       <RegularsGrid items={regulars} onOpen={(p) => setDrawerFor(p)} />
 
       <MenuSection cat={cat} setCat={setCat} items={catalog} onOpen={(p) => setDrawerFor(p)} />
+
+      <GallerySection />
+
+      <VenueSection />
 
       <Footer />
 
@@ -342,6 +354,117 @@ function MenuSection({
 // ============================================================================
 // FOOTER
 // ============================================================================
+// ============================================================================
+// GALLERY — editorial mosaic of real & atmospheric imagery
+// ============================================================================
+function GallerySection() {
+  const shots = [
+    { src: BOKETTO_PASTRY_HERO, alt: "Boketto signature pastry", tall: true, label: "Pastelería de autor" },
+    { src: galleryMatcha, alt: "Ceremonial matcha", tall: false, label: "Matcha ceremonial · Uji" },
+    { src: galleryInterior, alt: "Boketto interior", tall: false, label: "Guillem Sorolla 29" },
+    { src: BOKETTO_SIGNATURE, alt: "Signature dessert", tall: true, label: "La guinda del pastel" },
+    { src: galleryCroissant, alt: "Butter croissant", tall: false, label: "Laminado 72 capas" },
+    { src: galleryPistachio, alt: "Pistachio brioche", tall: false, label: "Brioche de pistacho" },
+  ];
+  return (
+    <section className="px-4 sm:px-8 py-24" id="gallery">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-12 animate-rise">
+          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">Gallery</p>
+          <h2 className="mt-3 font-serif text-3xl sm:text-4xl italic">Un pequeño diario visual</h2>
+          <div className="hairline w-16 mx-auto mt-6" />
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          {shots.map((s, i) => (
+            <figure
+              key={i}
+              className={`group relative overflow-hidden rounded-2xl glass press ${
+                s.tall ? "row-span-2 aspect-[3/5] md:aspect-[3/5]" : "aspect-square"
+              } ${i === 0 ? "md:col-span-2 md:row-span-2 md:aspect-auto" : ""}`}
+            >
+              <img
+                src={s.src}
+                alt={s.alt}
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.06]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-black/0 opacity-70 group-hover:opacity-90 transition-opacity" />
+              <figcaption className="absolute bottom-3 left-3 right-3 text-[10px] tracking-editorial uppercase text-white/90">
+                {s.label}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// VENUE — address + map link
+// ============================================================================
+function VenueSection() {
+  return (
+    <section className="px-4 sm:px-8 py-24" id="visit">
+      <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6 items-stretch">
+        <div className="glass rounded-3xl p-8 sm:p-10 flex flex-col justify-center animate-rise">
+          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">Visit</p>
+          <h2 className="mt-3 font-serif text-3xl sm:text-4xl italic">Guillem Sorolla, 29</h2>
+          <p className="mt-1 text-sm text-foreground/60">46008 València · España</p>
+
+          <div className="hairline w-16 my-6" />
+
+          <dl className="text-sm space-y-2 text-foreground/70">
+            <div className="flex justify-between"><dt>Lun – Vie</dt><dd className="tabular-nums">08:30 – 20:00</dd></div>
+            <div className="flex justify-between"><dt>Sáb – Dom</dt><dd className="tabular-nums">09:00 – 20:30</dd></div>
+          </dl>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a
+              href={MAPS_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="glass-dark shimmer press rounded-full px-6 py-3 text-xs tracking-editorial uppercase"
+            >
+              Cómo llegar →
+            </a>
+            <a
+              href="https://wa.me/34614191802"
+              target="_blank"
+              rel="noreferrer"
+              className="glass shimmer press rounded-full px-6 py-3 text-xs tracking-editorial uppercase"
+            >
+              WhatsApp
+            </a>
+          </div>
+        </div>
+
+        <a
+          href={MAPS_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="relative rounded-3xl overflow-hidden glass press min-h-[280px] group"
+          aria-label="Open in Google Maps"
+        >
+          <iframe
+            title="Boketto on Google Maps"
+            src="https://www.google.com/maps?q=Boketto+Specialty+Coffee+Guillem+Sorolla+29+Valencia&output=embed"
+            className="absolute inset-0 w-full h-full border-0 grayscale-[0.2] contrast-[1.02]"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white pointer-events-none">
+            <span className="text-[10px] tracking-editorial uppercase">Open in Google Maps</span>
+            <span className="text-lg">↗</span>
+          </div>
+        </a>
+      </div>
+    </section>
+  );
+}
+
 function Footer() {
   return (
     <footer className="px-6 py-16 text-center">
