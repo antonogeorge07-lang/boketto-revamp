@@ -2,6 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CATEGORY_META, useStore, type Category, type Modifier, type OrderLine, type Product } from "../lib/store";
 import { LanguageSwitcher } from "../lib/i18n";
+import galleryInterior from "../assets/gallery-interior.jpg";
+import galleryMatcha from "../assets/gallery-matcha.jpg";
+import galleryCroissant from "../assets/gallery-croissant.jpg";
+import galleryPistachio from "../assets/gallery-pistachio.jpg";
+
+const BOKETTO_PASTRY_HERO = "https://bokettopastry.com/wp-content/uploads/2025/12/WhatsApp-Image-2025-12-27-at-12.18.01.jpeg";
+const BOKETTO_SIGNATURE = "https://bokettopastry.com/wp-content/uploads/2025/12/WhatsApp-Image-2025-12-28-at-13.04.17-1024x768.jpeg";
+const MAPS_URL = "https://www.google.com/maps/place/Boketto+Specialty+Coffee/@39.4725533,-0.3824784,17z";
 
 export const Route = createFileRoute("/")({
   component: PublicStorefront,
