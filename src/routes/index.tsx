@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CATEGORY_META, useStore, type Category, type Modifier, type OrderLine, type Product } from "../lib/store";
 import { LanguageSwitcher } from "../lib/i18n";
+import { BKLogo } from "../components/BKLogo";
 import galleryInterior from "../assets/gallery-interior.jpg";
 import galleryMatcha from "../assets/gallery-matcha.jpg";
 import galleryCroissant from "../assets/gallery-croissant.jpg";
