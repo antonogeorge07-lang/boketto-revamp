@@ -787,27 +787,28 @@ function CheckoutSheet({
 // CONFIRM
 // ============================================================================
 function ConfirmSheet({ ref_, name, onDone }: { ref_: string; name: string; onDone: () => void }) {
+  const tt = useT();
   useEffect(() => {
     const t = setTimeout(onDone, 6000);
     return () => clearTimeout(t);
   }, [onDone]);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6 animate-rise">
-      <button aria-label="Close" onClick={onDone} className="absolute inset-0 bg-foreground/20 backdrop-blur-sm" />
+      <button aria-label={tt("done")} onClick={onDone} className="absolute inset-0 bg-foreground/20 backdrop-blur-sm" />
       <div className="glass-strong relative w-full max-w-sm rounded-[32px] p-8 text-center">
         <div className="mx-auto w-16 h-16 rounded-full glass-dark grid place-items-center animate-pulse-ring">
           <span className="text-[color:var(--gold)] text-2xl">✓</span>
         </div>
-        <p className="mt-6 text-[10px] tracking-editorial uppercase text-foreground/55">Order received</p>
+        <p className="mt-6 text-[10px] tracking-editorial uppercase text-foreground/55">{tt("order_received")}</p>
         <h3 className="mt-2 font-serif text-3xl">{ref_}</h3>
         <p className="mt-3 text-sm text-foreground/70">
-          Thank you, <span className="italic">{name}</span>. We're preparing it now.
+          {tt("thanks_pre")} <span className="italic">{name}</span>{tt("thanks_post")}
         </p>
         <button
           onClick={onDone}
           className="mt-6 w-full glass press rounded-full py-3 text-xs tracking-editorial uppercase"
         >
-          Done
+          {tt("done")}
         </button>
       </div>
     </div>
