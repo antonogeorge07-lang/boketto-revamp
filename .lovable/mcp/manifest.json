@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "sdk_version": "0.20.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://phxxdxgncpnkvuackhnf.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "boketto-mcp",
+      "version": "0.1.0",
+      "title": "Boketto Specialty Coffee"
+    },
+    "tools": [
+      {
+        "name": "get_menu",
+        "title": "Get menu",
+        "description": "Return Boketto's current menu. Optionally filter by category (bakery, bokematchas, coffee, brunch) or featured specials only.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "category": {
+              "description": "Filter by category.",
+              "type": "string",
+              "enum": [
+                "bakery",
+                "bokematchas",
+                "coffee",
+                "brunch"
+              ]
+            },
+            "featuredOnly": {
+              "description": "Only return today's specials.",
+              "type": "boolean"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_venue_info",
+        "title": "Get venue info",
+        "description": "Return Boketto Specialty Coffee's address, hours, and contact info.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "whoami",
+        "title": "Who am I",
+        "description": "Return the signed-in user's id and email for the current OAuth session.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
