@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CATEGORY_META, useStore, type Category, type Modifier, type OrderLine, type Product } from "../lib/store";
-import { LanguageSwitcher } from "../lib/i18n";
+import { LanguageSwitcher, useT } from "../lib/i18n";
 import { BKLogo } from "../components/BKLogo";
 import galleryInterior from "../assets/gallery-interior.jpg";
 import galleryMatcha from "../assets/gallery-matcha.jpg";
@@ -118,6 +118,7 @@ function PublicStorefront() {
 // FLOATING GLASS NAV
 // ============================================================================
 function FloatingNav() {
+  const t = useT();
   return (
     <header className="fixed top-4 inset-x-4 z-40 flex justify-center pointer-events-none">
       <div
@@ -141,7 +142,7 @@ function FloatingNav() {
           className="ml-1 press rounded-full px-4 py-2 text-[10px] tracking-editorial uppercase"
           style={{ backgroundColor: "var(--terracotta)", color: "var(--ivory)" }}
         >
-          Place your order
+          {t("place_order")}
         </a>
       </div>
     </header>
@@ -152,6 +153,7 @@ function FloatingNav() {
 // HERO
 // ============================================================================
 function Hero() {
+  const t = useT();
   return (
     <section className="relative min-h-[92svh] flex flex-col items-center justify-center px-6 pt-32 pb-24 text-center overflow-hidden">
       <div className="absolute inset-0 -z-10 pointer-events-none">
@@ -163,19 +165,19 @@ function Hero() {
 
       <div className="animate-rise">
         <p className="text-[10px] tracking-editorial uppercase text-foreground/50">
-          Specialty Coffee · Artisan Pastries · All-Day Brunch
+          {t("hero_kicker")}
         </p>
         <div className="hairline w-16 mx-auto mt-6" />
       </div>
 
       <h1 className="mt-10 font-serif italic text-5xl sm:text-6xl md:text-7xl leading-[1.02] tracking-tight max-w-4xl animate-rise-slow">
-        Mirar a la nada
+        {t("hero_h1_1")}
         <br />
-        <span className="text-foreground/80">y que te sepa a Boketto.</span>
+        <span className="text-foreground/80">{t("hero_h1_2")}</span>
       </h1>
 
       <p className="mt-8 max-w-md text-sm leading-relaxed text-foreground/65 animate-rise-slow">
-        A small Valencian room where coffee is treated as living matter and pastry as a small edible essay.
+        {t("hero_sub")}
       </p>
 
       <div className="mt-12 flex flex-wrap items-center justify-center gap-3 animate-rise-slow">
@@ -184,7 +186,7 @@ function Hero() {
           className="shimmer press rounded-full px-7 py-3 text-xs tracking-editorial uppercase"
           style={{ backgroundColor: "var(--terracotta)", color: "var(--ivory)" }}
         >
-          Explore the menu
+          {t("hero_cta_menu")}
         </a>
         <a
           href="https://wa.me/34614191802?text=Hola%20Boketto%2C%20me%20gustar%C3%ADa%20reservar%20mesa."
@@ -192,7 +194,7 @@ function Hero() {
           rel="noreferrer"
           className="glass shimmer press rounded-full px-7 py-3 text-xs tracking-editorial uppercase"
         >
-          Book a table →
+          {t("hero_cta_book")}
         </a>
       </div>
     </section>
@@ -203,6 +205,7 @@ function Hero() {
 // TODAY'S SPECIALS CAROUSEL
 // ============================================================================
 function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Product) => void }) {
+  const t = useT();
   const scrollerRef = useRef<HTMLDivElement>(null);
   if (items.length === 0) return null;
 
@@ -212,22 +215,22 @@ function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Pro
         <div className="flex items-end justify-between mb-8 px-2">
           <div>
             <p className="text-[10px] tracking-editorial uppercase text-foreground/55">
-              Today's Specials
+              {t("specials_kicker")}
             </p>
-            <h2 className="mt-3 font-serif text-3xl sm:text-4xl italic">Signature del día</h2>
+            <h2 className="mt-3 font-serif text-3xl sm:text-4xl italic">{t("specials_title")}</h2>
           </div>
           <div className="hidden sm:flex gap-2">
             <button
               onClick={() => scrollerRef.current?.scrollBy({ left: -320, behavior: "smooth" })}
               className="glass press rounded-full w-10 h-10 grid place-items-center text-lg"
-              aria-label="Previous"
+              aria-label={t("prev")}
             >
               ‹
             </button>
             <button
               onClick={() => scrollerRef.current?.scrollBy({ left: 320, behavior: "smooth" })}
               className="glass press rounded-full w-10 h-10 grid place-items-center text-lg"
-              aria-label="Next"
+              aria-label={t("next")}
             >
               ›
             </button>
@@ -252,7 +255,7 @@ function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Pro
                     backgroundImage: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), transparent 45%)"
                   }} />
                   <span className="absolute top-3 left-3 text-[9px] tracking-editorial uppercase glass rounded-full px-2.5 py-1">
-                    signature
+                    {t("signature_badge")}
                   </span>
                 </div>
                 <div className="flex items-baseline justify-between gap-4">
@@ -274,14 +277,15 @@ function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Pro
 // REGULARS
 // ============================================================================
 function RegularsGrid({ items, onOpen }: { items: Product[]; onOpen: (p: Product) => void }) {
+  const t = useT();
   if (items.length === 0) return null;
   return (
     <section className="px-4 sm:px-8 py-12">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-end justify-between mb-6 px-2">
           <div>
-            <p className="text-[10px] tracking-editorial uppercase text-foreground/55">The Regulars</p>
-            <h2 className="mt-3 font-serif text-2xl italic">Daily staples · quick tap</h2>
+            <p className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("regulars_kicker")}</p>
+            <h2 className="mt-3 font-serif text-2xl italic">{t("regulars_title")}</h2>
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -313,13 +317,14 @@ function MenuSection({
 }: {
   cat: Category; setCat: (c: Category) => void; items: Product[]; onOpen: (p: Product) => void;
 }) {
+  const t = useT();
   const cats: Category[] = ["bokematchas", "coffee", "bakery", "brunch"];
   return (
     <section id="menu" className="px-4 sm:px-8 py-16">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10">
-          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">The Menu</p>
-          <h2 className="mt-3 font-serif text-4xl sm:text-5xl italic">La carta</h2>
+          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("menu_kicker")}</p>
+          <h2 className="mt-3 font-serif text-4xl sm:text-5xl italic">{t("menu_title")}</h2>
           <div className="hairline w-16 mx-auto mt-6" />
         </div>
 
@@ -357,7 +362,7 @@ function MenuSection({
               <p className="mt-3 text-sm text-foreground/65 leading-relaxed">{p.desc}</p>
               {p.modifiers && p.modifiers.length > 0 && (
                 <p className="mt-3 text-[10px] tracking-editorial uppercase text-foreground/45">
-                  {p.modifiers.length} option{p.modifiers.length > 1 ? "s" : ""}
+                  {p.modifiers.length} {p.modifiers.length > 1 ? t("options_label") : t("option_label")}
                 </p>
               )}
             </button>
@@ -375,20 +380,21 @@ function MenuSection({
 // GALLERY — editorial mosaic of real & atmospheric imagery
 // ============================================================================
 function GallerySection() {
+  const t = useT();
   const shots = [
-    { src: BOKETTO_PASTRY_HERO, alt: "Boketto signature pastry", tall: true, label: "Pastelería de autor" },
-    { src: galleryMatcha, alt: "Ceremonial matcha", tall: false, label: "Matcha ceremonial · Uji" },
-    { src: galleryInterior, alt: "Boketto interior", tall: false, label: "Guillem Sorolla 29" },
-    { src: BOKETTO_SIGNATURE, alt: "Signature dessert", tall: true, label: "La guinda del pastel" },
-    { src: galleryCroissant, alt: "Butter croissant", tall: false, label: "Laminado 72 capas" },
-    { src: galleryPistachio, alt: "Pistachio brioche", tall: false, label: "Brioche de pistacho" },
+    { src: BOKETTO_PASTRY_HERO, alt: "Boketto signature pastry", tall: true, label: t("gal_pastry") },
+    { src: galleryMatcha, alt: "Ceremonial matcha", tall: false, label: t("gal_matcha") },
+    { src: galleryInterior, alt: "Boketto interior", tall: false, label: t("gal_interior") },
+    { src: BOKETTO_SIGNATURE, alt: "Signature dessert", tall: true, label: t("gal_signature") },
+    { src: galleryCroissant, alt: "Butter croissant", tall: false, label: t("gal_croissant") },
+    { src: galleryPistachio, alt: "Pistachio brioche", tall: false, label: t("gal_brioche") },
   ];
   return (
     <section className="px-4 sm:px-8 py-24" id="gallery">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12 animate-rise">
-          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">Gallery</p>
-          <h2 className="mt-3 font-serif text-3xl sm:text-4xl italic">Un pequeño diario visual</h2>
+          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("gallery_kicker")}</p>
+          <h2 className="mt-3 font-serif text-3xl sm:text-4xl italic">{t("gallery_title")}</h2>
           <div className="hairline w-16 mx-auto mt-6" />
         </div>
 
@@ -422,19 +428,20 @@ function GallerySection() {
 // VENUE — address + map link
 // ============================================================================
 function VenueSection() {
+  const t = useT();
   return (
     <section className="px-4 sm:px-8 py-24" id="visit">
       <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6 items-stretch">
         <div className="glass rounded-3xl p-8 sm:p-10 flex flex-col justify-center animate-rise">
-          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">Visit</p>
+          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("venue_kicker")}</p>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl italic">Guillem Sorolla, 29</h2>
-          <p className="mt-1 text-sm text-foreground/60">46008 València · España</p>
+          <p className="mt-1 text-sm text-foreground/60">{t("venue_addr2")}</p>
 
           <div className="hairline w-16 my-6" />
 
           <dl className="text-sm space-y-2 text-foreground/70">
-            <div className="flex justify-between"><dt>Lun – Vie</dt><dd className="tabular-nums">08:30 – 20:00</dd></div>
-            <div className="flex justify-between"><dt>Sáb – Dom</dt><dd className="tabular-nums">09:00 – 20:30</dd></div>
+            <div className="flex justify-between"><dt>{t("mon_fri")}</dt><dd className="tabular-nums">08:30 – 20:00</dd></div>
+            <div className="flex justify-between"><dt>{t("sat_sun")}</dt><dd className="tabular-nums">09:00 – 20:30</dd></div>
           </dl>
 
           <div className="mt-8 flex flex-wrap gap-3">
@@ -444,7 +451,7 @@ function VenueSection() {
               rel="noreferrer"
               className="glass-dark shimmer press rounded-full px-6 py-3 text-xs tracking-editorial uppercase"
             >
-              Cómo llegar →
+              {t("directions")}
             </a>
             <a
               href="https://wa.me/34614191802"
@@ -462,7 +469,7 @@ function VenueSection() {
           target="_blank"
           rel="noreferrer"
           className="relative rounded-3xl overflow-hidden glass press min-h-[280px] group"
-          aria-label="Open in Google Maps"
+          aria-label={t("open_maps")}
         >
           <iframe
             title="Boketto on Google Maps"
@@ -473,7 +480,7 @@ function VenueSection() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white pointer-events-none">
-            <span className="text-[10px] tracking-editorial uppercase">Open in Google Maps</span>
+            <span className="text-[10px] tracking-editorial uppercase">{t("open_maps")}</span>
             <span className="text-lg">↗</span>
           </div>
         </a>
@@ -483,16 +490,17 @@ function VenueSection() {
 }
 
 function Footer() {
+  const t = useT();
   return (
     <footer className="px-6 py-16 text-center">
       <div className="hairline w-16 mx-auto mb-6" />
       <div className="flex justify-center mb-3"><BKLogo className="h-10 w-10" tone="forest" /></div>
       <p className="font-serif text-lg italic">boketto</p>
       <p className="mt-2 text-[10px] tracking-editorial uppercase text-foreground/50">
-        guillem sorolla 29 · valència · es
+        {t("footer_addr")}
       </p>
       <p className="mt-1 text-[10px] tracking-editorial uppercase text-foreground/40">
-        est · 2021
+        {t("footer_est")}
       </p>
     </footer>
   );
@@ -506,6 +514,7 @@ function CustomizerDrawer({
 }: {
   product: Product; onClose: () => void; onAdd: (l: DraftLine) => void;
 }) {
+  const t = useT();
   const [milk, setMilk] = useState<string>("");
   const [dietary, setDietary] = useState<Record<string, boolean>>({});
   const [qty, setQty] = useState(1);
@@ -532,14 +541,14 @@ function CustomizerDrawer({
       />
       <div className="glass-strong relative w-full sm:max-w-lg rounded-t-[32px] sm:rounded-[32px] p-7 max-h-[85svh] overflow-y-auto">
         <div className="mx-auto h-1 w-10 rounded-full bg-foreground/15 sm:hidden mb-5" />
-        <p className="text-[10px] tracking-editorial uppercase text-foreground/50">Customize</p>
+        <p className="text-[10px] tracking-editorial uppercase text-foreground/50">{t("customize")}</p>
         <h3 className="mt-2 font-serif text-3xl">{product.name}</h3>
         <p className="mt-1 text-[10px] tracking-editorial uppercase text-foreground/45">{product.origin}</p>
         <p className="mt-4 text-sm text-foreground/70 leading-relaxed">{product.desc}</p>
 
         {milkOpts.length > 0 && (
           <div className="mt-6">
-            <p className="text-[10px] tracking-editorial uppercase text-foreground/55 mb-3">Milk</p>
+            <p className="text-[10px] tracking-editorial uppercase text-foreground/55 mb-3">{t("milk_label")}</p>
             <div className="grid grid-cols-3 gap-2">
               {milkOpts.map((m) => (
                 <button
@@ -559,7 +568,7 @@ function CustomizerDrawer({
 
         {dietOpts.length > 0 && (
           <div className="mt-5">
-            <p className="text-[10px] tracking-editorial uppercase text-foreground/55 mb-3">Dietary</p>
+            <p className="text-[10px] tracking-editorial uppercase text-foreground/55 mb-3">{t("dietary_label")}</p>
             <div className="flex flex-wrap gap-2">
               {dietOpts.map((m) => (
                 <label key={m.id} className={`glass press shimmer rounded-full px-4 py-2 text-xs cursor-pointer ${dietary[m.id] ? "glass-dark" : ""}`}>
@@ -578,7 +587,7 @@ function CustomizerDrawer({
 
         {otherOpts.length > 0 && (
           <div className="mt-5">
-            <p className="text-[10px] tracking-editorial uppercase text-foreground/55 mb-3">Add-ons</p>
+            <p className="text-[10px] tracking-editorial uppercase text-foreground/55 mb-3">{t("addons_label")}</p>
             <div className="flex flex-wrap gap-2">
               {otherOpts.map((m) => (
                 <label key={m.id} className={`glass press shimmer rounded-full px-4 py-2 text-xs cursor-pointer ${others[m.id] ? "glass-dark" : ""}`}>
@@ -602,7 +611,7 @@ function CustomizerDrawer({
             <button onClick={() => setQty((q) => q + 1)} className="press w-9 h-9 rounded-full text-lg">+</button>
           </div>
           <div className="text-right">
-            <p className="text-[10px] tracking-editorial uppercase text-foreground/50">Subtotal</p>
+            <p className="text-[10px] tracking-editorial uppercase text-foreground/50">{t("subtotal")}</p>
             <p className="font-serif text-2xl">€{total.toFixed(2)}</p>
           </div>
         </div>
@@ -620,7 +629,7 @@ function CustomizerDrawer({
           }
           className="mt-6 w-full glass-dark shimmer press rounded-full py-4 text-xs tracking-editorial uppercase"
         >
-          Add to order · €{total.toFixed(2)}
+          {t("add_to_order")} · €{total.toFixed(2)}
         </button>
       </div>
     </div>
@@ -640,6 +649,7 @@ function CartDrawer({
   onRemove: (idx: number) => void;
   onCheckout: () => void;
 }) {
+  const t = useT();
   const count = lines.reduce((n, l) => n + l.qty, 0);
   return (
     <div className={`fixed inset-x-0 bottom-0 z-40 pointer-events-none`}>
@@ -654,12 +664,12 @@ function CartDrawer({
                 {count}
               </span>
               <div className="text-left">
-                <p className="text-[10px] tracking-editorial uppercase text-foreground/55">Your order</p>
+                <p className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("your_order")}</p>
                 <p className="font-serif text-lg">€{total.toFixed(2)}</p>
               </div>
             </div>
             <span className="text-[10px] tracking-editorial uppercase text-foreground/60">
-              {open ? "Collapse ▾" : "Expand ▴"}
+              {open ? t("collapse") : t("expand")}
             </span>
           </button>
 
@@ -687,7 +697,7 @@ function CartDrawer({
                           onClick={() => onRemove(i)}
                           className="text-[10px] tracking-editorial uppercase text-foreground/40 hover:text-destructive"
                         >
-                          Remove
+                          {t("remove")}
                         </button>
                       </div>
                     </li>
@@ -698,7 +708,7 @@ function CartDrawer({
                 onClick={onCheckout}
                 className="mt-6 w-full glass-dark shimmer press rounded-full py-4 text-xs tracking-editorial uppercase"
               >
-                Checkout · €{total.toFixed(2)}
+                {t("checkout_btn")} · €{total.toFixed(2)}
               </button>
             </div>
           )}
@@ -720,38 +730,39 @@ function CheckoutSheet({
   onSubmit: () => void;
   onCancel: () => void;
 }) {
+  const t = useT();
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 animate-rise">
-      <button aria-label="Close" onClick={onCancel} className="absolute inset-0 bg-foreground/20 backdrop-blur-sm" />
+      <button aria-label={t("cancel")} onClick={onCancel} className="absolute inset-0 bg-foreground/20 backdrop-blur-sm" />
       <div className="glass-strong relative w-full sm:max-w-md rounded-t-[32px] sm:rounded-[32px] p-8">
-        <p className="text-[10px] tracking-editorial uppercase text-foreground/55">Checkout</p>
-        <h3 className="mt-2 font-serif text-3xl">Almost yours</h3>
-        <p className="mt-2 text-sm text-foreground/60">Pickup at the bar or drop-off at your table.</p>
+        <p className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("checkout_kicker")}</p>
+        <h3 className="mt-2 font-serif text-3xl">{t("checkout_title")}</h3>
+        <p className="mt-2 text-sm text-foreground/60">{t("checkout_sub")}</p>
 
         <div className="mt-6 space-y-3">
           <label className="block">
-            <span className="text-[10px] tracking-editorial uppercase text-foreground/55">Name</span>
+            <span className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("name_label")}</span>
             <input
               autoFocus
               value={value.name}
               onChange={(e) => setValue({ ...value, name: e.target.value })}
-              placeholder="e.g. María"
+              placeholder={t("name_ph")}
               className="mt-1 w-full glass rounded-2xl px-4 py-3 text-sm bg-white/50 focus:outline-none focus:ring-2 focus:ring-[color:var(--gold)]"
             />
           </label>
           <label className="block">
-            <span className="text-[10px] tracking-editorial uppercase text-foreground/55">Table (or leave blank for bar)</span>
+            <span className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("table_label")}</span>
             <input
               value={value.table}
               onChange={(e) => setValue({ ...value, table: e.target.value })}
-              placeholder="e.g. 4"
+              placeholder={t("table_ph")}
               className="mt-1 w-full glass rounded-2xl px-4 py-3 text-sm bg-white/50 focus:outline-none focus:ring-2 focus:ring-[color:var(--gold)]"
             />
           </label>
         </div>
 
         <div className="mt-6 flex items-center justify-between">
-          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">Total</p>
+          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("total")}</p>
           <p className="font-serif text-2xl">€{total.toFixed(2)}</p>
         </div>
 
@@ -759,13 +770,13 @@ function CheckoutSheet({
           onClick={onSubmit}
           className="mt-6 w-full glass-dark shimmer press rounded-full py-4 text-xs tracking-editorial uppercase"
         >
-          Send to bar
+          {t("send_bar")}
         </button>
         <button
           onClick={onCancel}
           className="mt-2 w-full text-[10px] tracking-editorial uppercase text-foreground/50 py-2"
         >
-          Cancel
+          {t("cancel")}
         </button>
       </div>
     </div>
@@ -776,27 +787,28 @@ function CheckoutSheet({
 // CONFIRM
 // ============================================================================
 function ConfirmSheet({ ref_, name, onDone }: { ref_: string; name: string; onDone: () => void }) {
+  const tt = useT();
   useEffect(() => {
     const t = setTimeout(onDone, 6000);
     return () => clearTimeout(t);
   }, [onDone]);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6 animate-rise">
-      <button aria-label="Close" onClick={onDone} className="absolute inset-0 bg-foreground/20 backdrop-blur-sm" />
+      <button aria-label={tt("done")} onClick={onDone} className="absolute inset-0 bg-foreground/20 backdrop-blur-sm" />
       <div className="glass-strong relative w-full max-w-sm rounded-[32px] p-8 text-center">
         <div className="mx-auto w-16 h-16 rounded-full glass-dark grid place-items-center animate-pulse-ring">
           <span className="text-[color:var(--gold)] text-2xl">✓</span>
         </div>
-        <p className="mt-6 text-[10px] tracking-editorial uppercase text-foreground/55">Order received</p>
+        <p className="mt-6 text-[10px] tracking-editorial uppercase text-foreground/55">{tt("order_received")}</p>
         <h3 className="mt-2 font-serif text-3xl">{ref_}</h3>
         <p className="mt-3 text-sm text-foreground/70">
-          Thank you, <span className="italic">{name}</span>. We're preparing it now.
+          {tt("thanks_pre")} <span className="italic">{name}</span>{tt("thanks_post")}
         </p>
         <button
           onClick={onDone}
           className="mt-6 w-full glass press rounded-full py-3 text-xs tracking-editorial uppercase"
         >
-          Done
+          {tt("done")}
         </button>
       </div>
     </div>
