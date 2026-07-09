@@ -611,7 +611,7 @@ function CustomizerDrawer({
             <button onClick={() => setQty((q) => q + 1)} className="press w-9 h-9 rounded-full text-lg">+</button>
           </div>
           <div className="text-right">
-            <p className="text-[10px] tracking-editorial uppercase text-foreground/50">Subtotal</p>
+            <p className="text-[10px] tracking-editorial uppercase text-foreground/50">{t("subtotal")}</p>
             <p className="font-serif text-2xl">€{total.toFixed(2)}</p>
           </div>
         </div>
