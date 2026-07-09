@@ -548,7 +548,7 @@ function CustomizerDrawer({
 
         {milkOpts.length > 0 && (
           <div className="mt-6">
-            <p className="text-[10px] tracking-editorial uppercase text-foreground/55 mb-3">Milk</p>
+            <p className="text-[10px] tracking-editorial uppercase text-foreground/55 mb-3">{t("milk_label")}</p>
             <div className="grid grid-cols-3 gap-2">
               {milkOpts.map((m) => (
                 <button
