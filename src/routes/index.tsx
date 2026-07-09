@@ -153,6 +153,7 @@ function FloatingNav() {
 // HERO
 // ============================================================================
 function Hero() {
+  const t = useT();
   return (
     <section className="relative min-h-[92svh] flex flex-col items-center justify-center px-6 pt-32 pb-24 text-center overflow-hidden">
       <div className="absolute inset-0 -z-10 pointer-events-none">
@@ -164,19 +165,19 @@ function Hero() {
 
       <div className="animate-rise">
         <p className="text-[10px] tracking-editorial uppercase text-foreground/50">
-          Specialty Coffee · Artisan Pastries · All-Day Brunch
+          {t("hero_kicker")}
         </p>
         <div className="hairline w-16 mx-auto mt-6" />
       </div>
 
       <h1 className="mt-10 font-serif italic text-5xl sm:text-6xl md:text-7xl leading-[1.02] tracking-tight max-w-4xl animate-rise-slow">
-        Mirar a la nada
+        {t("hero_h1_1")}
         <br />
-        <span className="text-foreground/80">y que te sepa a Boketto.</span>
+        <span className="text-foreground/80">{t("hero_h1_2")}</span>
       </h1>
 
       <p className="mt-8 max-w-md text-sm leading-relaxed text-foreground/65 animate-rise-slow">
-        A small Valencian room where coffee is treated as living matter and pastry as a small edible essay.
+        {t("hero_sub")}
       </p>
 
       <div className="mt-12 flex flex-wrap items-center justify-center gap-3 animate-rise-slow">
@@ -185,7 +186,7 @@ function Hero() {
           className="shimmer press rounded-full px-7 py-3 text-xs tracking-editorial uppercase"
           style={{ backgroundColor: "var(--terracotta)", color: "var(--ivory)" }}
         >
-          Explore the menu
+          {t("hero_cta_menu")}
         </a>
         <a
           href="https://wa.me/34614191802?text=Hola%20Boketto%2C%20me%20gustar%C3%ADa%20reservar%20mesa."
@@ -193,7 +194,7 @@ function Hero() {
           rel="noreferrer"
           className="glass shimmer press rounded-full px-7 py-3 text-xs tracking-editorial uppercase"
         >
-          Book a table →
+          {t("hero_cta_book")}
         </a>
       </div>
     </section>
