@@ -541,7 +541,7 @@ function CustomizerDrawer({
       />
       <div className="glass-strong relative w-full sm:max-w-lg rounded-t-[32px] sm:rounded-[32px] p-7 max-h-[85svh] overflow-y-auto">
         <div className="mx-auto h-1 w-10 rounded-full bg-foreground/15 sm:hidden mb-5" />
-        <p className="text-[10px] tracking-editorial uppercase text-foreground/50">Customize</p>
+        <p className="text-[10px] tracking-editorial uppercase text-foreground/50">{t("customize")}</p>
         <h3 className="mt-2 font-serif text-3xl">{product.name}</h3>
         <p className="mt-1 text-[10px] tracking-editorial uppercase text-foreground/45">{product.origin}</p>
         <p className="mt-4 text-sm text-foreground/70 leading-relaxed">{product.desc}</p>
