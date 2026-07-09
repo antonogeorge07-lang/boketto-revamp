@@ -664,12 +664,12 @@ function CartDrawer({
                 {count}
               </span>
               <div className="text-left">
-                <p className="text-[10px] tracking-editorial uppercase text-foreground/55">Your order</p>
+                <p className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("your_order")}</p>
                 <p className="font-serif text-lg">€{total.toFixed(2)}</p>
               </div>
             </div>
             <span className="text-[10px] tracking-editorial uppercase text-foreground/60">
-              {open ? "Collapse ▾" : "Expand ▴"}
+              {open ? t("collapse") : t("expand")}
             </span>
           </button>
 
