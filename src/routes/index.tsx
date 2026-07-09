@@ -649,6 +649,7 @@ function CartDrawer({
   onRemove: (idx: number) => void;
   onCheckout: () => void;
 }) {
+  const t = useT();
   const count = lines.reduce((n, l) => n + l.qty, 0);
   return (
     <div className={`fixed inset-x-0 bottom-0 z-40 pointer-events-none`}>
