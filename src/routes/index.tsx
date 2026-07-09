@@ -629,7 +629,7 @@ function CustomizerDrawer({
           }
           className="mt-6 w-full glass-dark shimmer press rounded-full py-4 text-xs tracking-editorial uppercase"
         >
-          Add to order · €{total.toFixed(2)}
+          {t("add_to_order")} · €{total.toFixed(2)}
         </button>
       </div>
     </div>
