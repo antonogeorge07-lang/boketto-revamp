@@ -99,6 +99,78 @@ export const UI: Dict = {
   available: { es: "Disponible", en: "Available", ja: "販売中" },
   agotado: { es: "Agotado", en: "Sold out", ja: "売切" },
   pos_footer: { es: "Boketto · POS interno", en: "Boketto · Internal POS", ja: "Boketto · 内部POS" },
+
+  // Storefront hero
+  hero_kicker: { es: "Café de Especialidad · Pastelería Artesana · Brunch todo el día", en: "Specialty Coffee · Artisan Pastries · All-Day Brunch", ja: "スペシャルティコーヒー · 職人パティスリー · 終日ブランチ" },
+  hero_h1_1: { es: "Mirar a la nada", en: "To gaze at nothing", ja: "何も見ずに" },
+  hero_h1_2: { es: "y que te sepa a Boketto.", en: "and taste it as Boketto.", ja: "Bokettoの味がする。" },
+  hero_sub: {
+    es: "Una pequeña sala valenciana donde el café se trata como materia viva y la pastelería como un pequeño ensayo comestible.",
+    en: "A small Valencian room where coffee is treated as living matter and pastry as a small edible essay.",
+    ja: "コーヒーを生きた素材、パティスリーを小さな食べるエッセイとして扱う、バレンシアの小さなサロン。",
+  },
+  hero_cta_menu: { es: "Explorar la carta", en: "Explore the menu", ja: "メニューを見る" },
+  hero_cta_book: { es: "Reservar mesa →", en: "Book a table →", ja: "予約する →" },
+  place_order: { es: "Hacer pedido", en: "Place your order", ja: "注文する" },
+
+  // Sections
+  specials_kicker: { es: "Especiales de hoy", en: "Today's Specials", ja: "本日のスペシャル" },
+  specials_title: { es: "Signature del día", en: "Signature of the day", ja: "本日のシグネチャー" },
+  signature_badge: { es: "signature", en: "signature", ja: "シグネチャー" },
+  prev: { es: "Anterior", en: "Previous", ja: "前へ" },
+  next: { es: "Siguiente", en: "Next", ja: "次へ" },
+  regulars_kicker: { es: "Los habituales", en: "The Regulars", ja: "定番" },
+  regulars_title: { es: "Básicos diarios · un solo toque", en: "Daily staples · quick tap", ja: "毎日の定番 · ワンタップ" },
+  menu_kicker: { es: "La carta", en: "The Menu", ja: "メニュー" },
+  menu_title: { es: "La carta", en: "Our menu", ja: "メニュー" },
+  options_label: { es: "opciones", en: "options", ja: "オプション" },
+  option_label: { es: "opción", en: "option", ja: "オプション" },
+  gallery_kicker: { es: "Galería", en: "Gallery", ja: "ギャラリー" },
+  gallery_title: { es: "Un pequeño diario visual", en: "A small visual diary", ja: "小さなビジュアル日記" },
+  gal_pastry: { es: "Pastelería de autor", en: "Signature pastry", ja: "作家性のパティスリー" },
+  gal_matcha: { es: "Matcha ceremonial · Uji", en: "Ceremonial matcha · Uji", ja: "儀式用抹茶 · 宇治" },
+  gal_interior: { es: "Guillem Sorolla 29", en: "Guillem Sorolla 29", ja: "Guillem Sorolla 29" },
+  gal_signature: { es: "La guinda del pastel", en: "The icing on top", ja: "仕上げの一品" },
+  gal_croissant: { es: "Laminado 72 capas", en: "72-layer lamination", ja: "72層の折り込み" },
+  gal_brioche: { es: "Brioche de pistacho", en: "Pistachio brioche", ja: "ピスタチオ ブリオッシュ" },
+  venue_kicker: { es: "Visítanos", en: "Visit", ja: "訪問" },
+  venue_addr2: { es: "46008 València · España", en: "46008 València · Spain", ja: "46008 バレンシア · スペイン" },
+  mon_fri: { es: "Lun – Vie", en: "Mon – Fri", ja: "月 – 金" },
+  sat_sun: { es: "Sáb – Dom", en: "Sat – Sun", ja: "土 – 日" },
+  directions: { es: "Cómo llegar →", en: "Directions →", ja: "行き方 →" },
+  open_maps: { es: "Abrir en Google Maps", en: "Open in Google Maps", ja: "Google マップで開く" },
+  footer_addr: { es: "guillem sorolla 29 · valència · es", en: "guillem sorolla 29 · valència · es", ja: "guillem sorolla 29 · バレンシア · es" },
+  footer_est: { es: "est · 2021", en: "est · 2021", ja: "創業 · 2021" },
+
+  // Customizer
+  customize: { es: "Personaliza", en: "Customize", ja: "カスタマイズ" },
+  milk_label: { es: "Leche", en: "Milk", ja: "ミルク" },
+  dietary_label: { es: "Dietético", en: "Dietary", ja: "食事対応" },
+  addons_label: { es: "Extras", en: "Add-ons", ja: "追加" },
+  subtotal: { es: "Subtotal", en: "Subtotal", ja: "小計" },
+  add_to_order: { es: "Añadir al pedido", en: "Add to order", ja: "注文に追加" },
+
+  // Cart / checkout
+  your_order: { es: "Tu pedido", en: "Your order", ja: "ご注文" },
+  collapse: { es: "Ocultar ▾", en: "Collapse ▾", ja: "閉じる ▾" },
+  expand: { es: "Ver ▴", en: "Expand ▴", ja: "開く ▴" },
+  checkout_btn: { es: "Finalizar", en: "Checkout", ja: "会計へ" },
+  checkout_kicker: { es: "Finalizar", en: "Checkout", ja: "会計" },
+  checkout_title: { es: "Casi tuyo", en: "Almost yours", ja: "もうすぐ完了" },
+  checkout_sub: { es: "Recogida en barra o entrega en tu mesa.", en: "Pickup at the bar or drop-off at your table.", ja: "カウンター受取または席までお届け。" },
+  name_label: { es: "Nombre", en: "Name", ja: "お名前" },
+  name_ph: { es: "ej. María", en: "e.g. María", ja: "例: マリア" },
+  table_label: { es: "Mesa (o vacío para barra)", en: "Table (or leave blank for bar)", ja: "テーブル(空欄でカウンター)" },
+  table_ph: { es: "ej. 4", en: "e.g. 4", ja: "例: 4" },
+  total: { es: "Total", en: "Total", ja: "合計" },
+  send_bar: { es: "Enviar a la barra", en: "Send to bar", ja: "カウンターへ送信" },
+  cancel: { es: "Cancelar", en: "Cancel", ja: "キャンセル" },
+
+  // Confirm
+  order_received: { es: "Pedido recibido", en: "Order received", ja: "注文受付" },
+  thanks_pre: { es: "Gracias,", en: "Thank you,", ja: "ありがとう、" },
+  thanks_post: { es: ". Lo estamos preparando.", en: ". We're preparing it now.", ja: "。ただいまご用意中です。" },
+  done: { es: "Listo", en: "Done", ja: "完了" },
 };
 
 const LangCtx = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({
