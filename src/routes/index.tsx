@@ -587,7 +587,7 @@ function CustomizerDrawer({
 
         {otherOpts.length > 0 && (
           <div className="mt-5">
-            <p className="text-[10px] tracking-editorial uppercase text-foreground/55 mb-3">Add-ons</p>
+            <p className="text-[10px] tracking-editorial uppercase text-foreground/55 mb-3">{t("addons_label")}</p>
             <div className="flex flex-wrap gap-2">
               {otherOpts.map((m) => (
                 <label key={m.id} className={`glass press shimmer rounded-full px-4 py-2 text-xs cursor-pointer ${others[m.id] ? "glass-dark" : ""}`}>
