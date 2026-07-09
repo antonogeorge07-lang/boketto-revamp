@@ -205,6 +205,7 @@ function Hero() {
 // TODAY'S SPECIALS CAROUSEL
 // ============================================================================
 function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Product) => void }) {
+  const t = useT();
   const scrollerRef = useRef<HTMLDivElement>(null);
   if (items.length === 0) return null;
 
@@ -214,22 +215,22 @@ function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Pro
         <div className="flex items-end justify-between mb-8 px-2">
           <div>
             <p className="text-[10px] tracking-editorial uppercase text-foreground/55">
-              Today's Specials
+              {t("specials_kicker")}
             </p>
-            <h2 className="mt-3 font-serif text-3xl sm:text-4xl italic">Signature del día</h2>
+            <h2 className="mt-3 font-serif text-3xl sm:text-4xl italic">{t("specials_title")}</h2>
           </div>
           <div className="hidden sm:flex gap-2">
             <button
               onClick={() => scrollerRef.current?.scrollBy({ left: -320, behavior: "smooth" })}
               className="glass press rounded-full w-10 h-10 grid place-items-center text-lg"
-              aria-label="Previous"
+              aria-label={t("prev")}
             >
               ‹
             </button>
             <button
               onClick={() => scrollerRef.current?.scrollBy({ left: 320, behavior: "smooth" })}
               className="glass press rounded-full w-10 h-10 grid place-items-center text-lg"
-              aria-label="Next"
+              aria-label={t("next")}
             >
               ›
             </button>
@@ -254,7 +255,7 @@ function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Pro
                     backgroundImage: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), transparent 45%)"
                   }} />
                   <span className="absolute top-3 left-3 text-[9px] tracking-editorial uppercase glass rounded-full px-2.5 py-1">
-                    signature
+                    {t("signature_badge")}
                   </span>
                 </div>
                 <div className="flex items-baseline justify-between gap-4">
