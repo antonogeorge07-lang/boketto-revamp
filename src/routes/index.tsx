@@ -277,14 +277,15 @@ function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Pro
 // REGULARS
 // ============================================================================
 function RegularsGrid({ items, onOpen }: { items: Product[]; onOpen: (p: Product) => void }) {
+  const t = useT();
   if (items.length === 0) return null;
   return (
     <section className="px-4 sm:px-8 py-12">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-end justify-between mb-6 px-2">
           <div>
-            <p className="text-[10px] tracking-editorial uppercase text-foreground/55">The Regulars</p>
-            <h2 className="mt-3 font-serif text-2xl italic">Daily staples · quick tap</h2>
+            <p className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("regulars_kicker")}</p>
+            <h2 className="mt-3 font-serif text-2xl italic">{t("regulars_title")}</h2>
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
