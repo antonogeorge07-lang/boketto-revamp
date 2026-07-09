@@ -514,6 +514,7 @@ function CustomizerDrawer({
 }: {
   product: Product; onClose: () => void; onAdd: (l: DraftLine) => void;
 }) {
+  const t = useT();
   const [milk, setMilk] = useState<string>("");
   const [dietary, setDietary] = useState<Record<string, boolean>>({});
   const [qty, setQty] = useState(1);
