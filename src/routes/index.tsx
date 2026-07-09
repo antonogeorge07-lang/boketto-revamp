@@ -380,20 +380,21 @@ function MenuSection({
 // GALLERY — editorial mosaic of real & atmospheric imagery
 // ============================================================================
 function GallerySection() {
+  const t = useT();
   const shots = [
-    { src: BOKETTO_PASTRY_HERO, alt: "Boketto signature pastry", tall: true, label: "Pastelería de autor" },
-    { src: galleryMatcha, alt: "Ceremonial matcha", tall: false, label: "Matcha ceremonial · Uji" },
-    { src: galleryInterior, alt: "Boketto interior", tall: false, label: "Guillem Sorolla 29" },
-    { src: BOKETTO_SIGNATURE, alt: "Signature dessert", tall: true, label: "La guinda del pastel" },
-    { src: galleryCroissant, alt: "Butter croissant", tall: false, label: "Laminado 72 capas" },
-    { src: galleryPistachio, alt: "Pistachio brioche", tall: false, label: "Brioche de pistacho" },
+    { src: BOKETTO_PASTRY_HERO, alt: "Boketto signature pastry", tall: true, label: t("gal_pastry") },
+    { src: galleryMatcha, alt: "Ceremonial matcha", tall: false, label: t("gal_matcha") },
+    { src: galleryInterior, alt: "Boketto interior", tall: false, label: t("gal_interior") },
+    { src: BOKETTO_SIGNATURE, alt: "Signature dessert", tall: true, label: t("gal_signature") },
+    { src: galleryCroissant, alt: "Butter croissant", tall: false, label: t("gal_croissant") },
+    { src: galleryPistachio, alt: "Pistachio brioche", tall: false, label: t("gal_brioche") },
   ];
   return (
     <section className="px-4 sm:px-8 py-24" id="gallery">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12 animate-rise">
-          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">Gallery</p>
-          <h2 className="mt-3 font-serif text-3xl sm:text-4xl italic">Un pequeño diario visual</h2>
+          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("gallery_kicker")}</p>
+          <h2 className="mt-3 font-serif text-3xl sm:text-4xl italic">{t("gallery_title")}</h2>
           <div className="hairline w-16 mx-auto mt-6" />
         </div>
 
@@ -427,19 +428,20 @@ function GallerySection() {
 // VENUE — address + map link
 // ============================================================================
 function VenueSection() {
+  const t = useT();
   return (
     <section className="px-4 sm:px-8 py-24" id="visit">
       <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6 items-stretch">
         <div className="glass rounded-3xl p-8 sm:p-10 flex flex-col justify-center animate-rise">
-          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">Visit</p>
+          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("venue_kicker")}</p>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl italic">Guillem Sorolla, 29</h2>
-          <p className="mt-1 text-sm text-foreground/60">46008 València · España</p>
+          <p className="mt-1 text-sm text-foreground/60">{t("venue_addr2")}</p>
 
           <div className="hairline w-16 my-6" />
 
           <dl className="text-sm space-y-2 text-foreground/70">
-            <div className="flex justify-between"><dt>Lun – Vie</dt><dd className="tabular-nums">08:30 – 20:00</dd></div>
-            <div className="flex justify-between"><dt>Sáb – Dom</dt><dd className="tabular-nums">09:00 – 20:30</dd></div>
+            <div className="flex justify-between"><dt>{t("mon_fri")}</dt><dd className="tabular-nums">08:30 – 20:00</dd></div>
+            <div className="flex justify-between"><dt>{t("sat_sun")}</dt><dd className="tabular-nums">09:00 – 20:30</dd></div>
           </dl>
 
           <div className="mt-8 flex flex-wrap gap-3">
@@ -449,7 +451,7 @@ function VenueSection() {
               rel="noreferrer"
               className="glass-dark shimmer press rounded-full px-6 py-3 text-xs tracking-editorial uppercase"
             >
-              Cómo llegar →
+              {t("directions")}
             </a>
             <a
               href="https://wa.me/34614191802"
@@ -467,7 +469,7 @@ function VenueSection() {
           target="_blank"
           rel="noreferrer"
           className="relative rounded-3xl overflow-hidden glass press min-h-[280px] group"
-          aria-label="Open in Google Maps"
+          aria-label={t("open_maps")}
         >
           <iframe
             title="Boketto on Google Maps"
@@ -478,7 +480,7 @@ function VenueSection() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white pointer-events-none">
-            <span className="text-[10px] tracking-editorial uppercase">Open in Google Maps</span>
+            <span className="text-[10px] tracking-editorial uppercase">{t("open_maps")}</span>
             <span className="text-lg">↗</span>
           </div>
         </a>
@@ -488,16 +490,17 @@ function VenueSection() {
 }
 
 function Footer() {
+  const t = useT();
   return (
     <footer className="px-6 py-16 text-center">
       <div className="hairline w-16 mx-auto mb-6" />
       <div className="flex justify-center mb-3"><BKLogo className="h-10 w-10" tone="forest" /></div>
       <p className="font-serif text-lg italic">boketto</p>
       <p className="mt-2 text-[10px] tracking-editorial uppercase text-foreground/50">
-        guillem sorolla 29 · valència · es
+        {t("footer_addr")}
       </p>
       <p className="mt-1 text-[10px] tracking-editorial uppercase text-foreground/40">
-        est · 2021
+        {t("footer_est")}
       </p>
     </footer>
   );
