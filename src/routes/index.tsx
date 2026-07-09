@@ -730,38 +730,39 @@ function CheckoutSheet({
   onSubmit: () => void;
   onCancel: () => void;
 }) {
+  const t = useT();
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 animate-rise">
-      <button aria-label="Close" onClick={onCancel} className="absolute inset-0 bg-foreground/20 backdrop-blur-sm" />
+      <button aria-label={t("cancel")} onClick={onCancel} className="absolute inset-0 bg-foreground/20 backdrop-blur-sm" />
       <div className="glass-strong relative w-full sm:max-w-md rounded-t-[32px] sm:rounded-[32px] p-8">
-        <p className="text-[10px] tracking-editorial uppercase text-foreground/55">Checkout</p>
-        <h3 className="mt-2 font-serif text-3xl">Almost yours</h3>
-        <p className="mt-2 text-sm text-foreground/60">Pickup at the bar or drop-off at your table.</p>
+        <p className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("checkout_kicker")}</p>
+        <h3 className="mt-2 font-serif text-3xl">{t("checkout_title")}</h3>
+        <p className="mt-2 text-sm text-foreground/60">{t("checkout_sub")}</p>
 
         <div className="mt-6 space-y-3">
           <label className="block">
-            <span className="text-[10px] tracking-editorial uppercase text-foreground/55">Name</span>
+            <span className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("name_label")}</span>
             <input
               autoFocus
               value={value.name}
               onChange={(e) => setValue({ ...value, name: e.target.value })}
-              placeholder="e.g. María"
+              placeholder={t("name_ph")}
               className="mt-1 w-full glass rounded-2xl px-4 py-3 text-sm bg-white/50 focus:outline-none focus:ring-2 focus:ring-[color:var(--gold)]"
             />
           </label>
           <label className="block">
-            <span className="text-[10px] tracking-editorial uppercase text-foreground/55">Table (or leave blank for bar)</span>
+            <span className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("table_label")}</span>
             <input
               value={value.table}
               onChange={(e) => setValue({ ...value, table: e.target.value })}
-              placeholder="e.g. 4"
+              placeholder={t("table_ph")}
               className="mt-1 w-full glass rounded-2xl px-4 py-3 text-sm bg-white/50 focus:outline-none focus:ring-2 focus:ring-[color:var(--gold)]"
             />
           </label>
         </div>
 
         <div className="mt-6 flex items-center justify-between">
-          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">Total</p>
+          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("total")}</p>
           <p className="font-serif text-2xl">€{total.toFixed(2)}</p>
         </div>
 
@@ -769,13 +770,13 @@ function CheckoutSheet({
           onClick={onSubmit}
           className="mt-6 w-full glass-dark shimmer press rounded-full py-4 text-xs tracking-editorial uppercase"
         >
-          Send to bar
+          {t("send_bar")}
         </button>
         <button
           onClick={onCancel}
           className="mt-2 w-full text-[10px] tracking-editorial uppercase text-foreground/50 py-2"
         >
-          Cancel
+          {t("cancel")}
         </button>
       </div>
     </div>
