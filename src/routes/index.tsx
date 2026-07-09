@@ -708,7 +708,7 @@ function CartDrawer({
                 onClick={onCheckout}
                 className="mt-6 w-full glass-dark shimmer press rounded-full py-4 text-xs tracking-editorial uppercase"
               >
-                Checkout · €{total.toFixed(2)}
+                {t("checkout_btn")} · €{total.toFixed(2)}
               </button>
             </div>
           )}
