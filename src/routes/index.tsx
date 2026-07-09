@@ -118,6 +118,7 @@ function PublicStorefront() {
 // FLOATING GLASS NAV
 // ============================================================================
 function FloatingNav() {
+  const t = useT();
   return (
     <header className="fixed top-4 inset-x-4 z-40 flex justify-center pointer-events-none">
       <div
@@ -141,7 +142,7 @@ function FloatingNav() {
           className="ml-1 press rounded-full px-4 py-2 text-[10px] tracking-editorial uppercase"
           style={{ backgroundColor: "var(--terracotta)", color: "var(--ivory)" }}
         >
-          Place your order
+          {t("place_order")}
         </a>
       </div>
     </header>
