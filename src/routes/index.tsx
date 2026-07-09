@@ -568,7 +568,7 @@ function CustomizerDrawer({
 
         {dietOpts.length > 0 && (
           <div className="mt-5">
-            <p className="text-[10px] tracking-editorial uppercase text-foreground/55 mb-3">Dietary</p>
+            <p className="text-[10px] tracking-editorial uppercase text-foreground/55 mb-3">{t("dietary_label")}</p>
             <div className="flex flex-wrap gap-2">
               {dietOpts.map((m) => (
                 <label key={m.id} className={`glass press shimmer rounded-full px-4 py-2 text-xs cursor-pointer ${dietary[m.id] ? "glass-dark" : ""}`}>
