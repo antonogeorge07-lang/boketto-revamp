@@ -697,7 +697,7 @@ function CartDrawer({
                           onClick={() => onRemove(i)}
                           className="text-[10px] tracking-editorial uppercase text-foreground/40 hover:text-destructive"
                         >
-                          Remove
+                          {t("remove")}
                         </button>
                       </div>
                     </li>
