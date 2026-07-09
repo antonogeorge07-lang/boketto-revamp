@@ -317,13 +317,14 @@ function MenuSection({
 }: {
   cat: Category; setCat: (c: Category) => void; items: Product[]; onOpen: (p: Product) => void;
 }) {
+  const t = useT();
   const cats: Category[] = ["bokematchas", "coffee", "bakery", "brunch"];
   return (
     <section id="menu" className="px-4 sm:px-8 py-16">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10">
-          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">The Menu</p>
-          <h2 className="mt-3 font-serif text-4xl sm:text-5xl italic">La carta</h2>
+          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">{t("menu_kicker")}</p>
+          <h2 className="mt-3 font-serif text-4xl sm:text-5xl italic">{t("menu_title")}</h2>
           <div className="hairline w-16 mx-auto mt-6" />
         </div>
 
@@ -361,7 +362,7 @@ function MenuSection({
               <p className="mt-3 text-sm text-foreground/65 leading-relaxed">{p.desc}</p>
               {p.modifiers && p.modifiers.length > 0 && (
                 <p className="mt-3 text-[10px] tracking-editorial uppercase text-foreground/45">
-                  {p.modifiers.length} option{p.modifiers.length > 1 ? "s" : ""}
+                  {p.modifiers.length} {p.modifiers.length > 1 ? t("options_label") : t("option_label")}
                 </p>
               )}
             </button>
