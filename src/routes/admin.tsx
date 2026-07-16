@@ -3,18 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import { CATEGORY_META, useStaffAuth, useStore, type Category } from "../lib/store";
 
 export const Route = createFileRoute("/admin")({
-  component: AdminGate,
+  component: AdminPage,
 });
 
-function AdminGate() {
-  const { authed, ready } = useStaffAuth();
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (ready && !authed) navigate({ to: "/login", search: { redirect: "/admin" } });
-  }, [authed, ready, navigate]);
-  if (!ready || !authed) return null;
-  return <AdminPage />;
-}
 
 function AdminPage() {
   const { products, updateProduct, toggleSoldOut, toggleFeatured, orders } = useStore();
