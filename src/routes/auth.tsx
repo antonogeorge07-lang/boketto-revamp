@@ -121,6 +121,7 @@ function AuthPage() {
               className="w-full glass rounded-2xl px-4 py-3 text-sm bg-white/50 focus:outline-none focus:ring-2 focus:ring-[color:var(--gold)]"
             />
             {err && <p className="text-xs text-destructive">{err}</p>}
+            {info && <p className="text-xs text-foreground/70">{info}</p>}
             <button
               type="submit"
               disabled={busy}
@@ -130,12 +131,23 @@ function AuthPage() {
             </button>
           </form>
 
+          {mode === "signin" && (
+            <button
+              onClick={forgotPassword}
+              disabled={busy}
+              className="w-full text-[10px] tracking-editorial uppercase text-foreground/55 hover:text-foreground disabled:opacity-50"
+            >
+              Forgot password?
+            </button>
+          )}
+
           <button
-            onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setErr(null); }}
+            onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setErr(null); setInfo(null); }}
             className="w-full text-[10px] tracking-editorial uppercase text-foreground/55 hover:text-foreground"
           >
             {mode === "signin" ? "Create an account" : "Have an account? Sign in"}
           </button>
+
         </div>
       </div>
     </div>
