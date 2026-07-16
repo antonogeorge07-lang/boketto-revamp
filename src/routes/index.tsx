@@ -206,36 +206,18 @@ function Hero() {
 // ============================================================================
 function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Product) => void }) {
   const t = useT();
-  const scrollerRef = useRef<HTMLDivElement>(null);
   if (items.length === 0) return null;
 
   return (
     <section className="px-4 sm:px-8 py-16">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-end justify-between mb-8 px-2">
-          <div>
-            <p className="text-[10px] tracking-editorial uppercase text-foreground/55">
-              {t("specials_kicker")}
-            </p>
-            <h2 className="mt-3 font-serif text-3xl sm:text-4xl italic">{t("specials_title")}</h2>
-          </div>
-          <div className="hidden sm:flex gap-2">
-            <button
-              onClick={() => scrollerRef.current?.scrollBy({ left: -320, behavior: "smooth" })}
-              className="glass press rounded-full w-10 h-10 grid place-items-center text-lg"
-              aria-label={t("prev")}
-            >
-              ‹
-            </button>
-            <button
-              onClick={() => scrollerRef.current?.scrollBy({ left: 320, behavior: "smooth" })}
-              className="glass press rounded-full w-10 h-10 grid place-items-center text-lg"
-              aria-label={t("next")}
-            >
-              ›
-            </button>
-          </div>
+        <div className="mb-8 px-2">
+          <p className="text-[10px] tracking-editorial uppercase text-foreground/55">
+            {t("specials_kicker")}
+          </p>
+          <h2 className="mt-3 font-serif text-3xl sm:text-4xl italic">{t("specials_title")}</h2>
         </div>
+
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {items.map((p) => (
