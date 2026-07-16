@@ -19,8 +19,9 @@ function LoginPage() {
   const [err, setErr] = useState("");
 
   useEffect(() => {
-    if (ready && authed) navigate({ to: search.redirect === "/kds" ? "/kds" : "/admin" });
+    // Auto-redirect when already signed in disabled for preview.
   }, [ready, authed, navigate, search.redirect]);
+
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
