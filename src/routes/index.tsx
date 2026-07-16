@@ -502,16 +502,8 @@ function Footer() {
       <p className="mt-1 text-[10px] tracking-editorial uppercase text-foreground/40">
         {t("footer_est")}
       </p>
-      <div className="mt-6 flex justify-center gap-3 text-[10px] tracking-editorial uppercase text-foreground/50">
-        <Link to="/login" className="hover:text-foreground">Staff</Link>
-        <span className="text-foreground/20">·</span>
-        <Link to="/auth" className="hover:text-foreground">Sign in</Link>
-        <span className="text-foreground/20">·</span>
-        <Link to="/admin" className="hover:text-foreground">Admin</Link>
-        <span className="text-foreground/20">·</span>
-        <Link to="/kds" className="hover:text-foreground">KDS</Link>
-      </div>
     </footer>
+
 
   );
 }
