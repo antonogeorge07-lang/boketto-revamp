@@ -3,18 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useStaffAuth, useStore, type Order, type OrderStatus } from "../lib/store";
 
 export const Route = createFileRoute("/kds")({
-  component: KdsGate,
+  component: KdsPage,
 });
 
-function KdsGate() {
-  const { authed, ready } = useStaffAuth();
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (ready && !authed) navigate({ to: "/login", search: { redirect: "/kds" } });
-  }, [authed, ready, navigate]);
-  if (!ready || !authed) return null;
-  return <KdsPage />;
-}
 
 const STATUS_META: Record<OrderStatus, { label: string; next: string; color: string }> = {
   received: { label: "Received", next: "Start preparing", color: "var(--gold)" },
