@@ -1,0 +1,215 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --font-sans: "Inter", "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", ui-serif, Georgia, serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-gold: var(--gold);
+  --color-forest: var(--forest);
+  --color-terracotta: var(--terracotta);
+  --color-ivory: var(--ivory);
+}
+
+:root {
+  --radius: 1.25rem;
+  /* Boketto — official palette (from bokettopastry.com) */
+  --background: oklch(0.945 0.038 70);         /* #FCE7CE warm peach cream */
+  --foreground: oklch(0.36 0.028 155);         /* #3E5B47 sage forest ink */
+  --card: oklch(0.965 0.028 72);
+  --card-foreground: oklch(0.36 0.028 155);
+  --popover: oklch(0.965 0.028 72);
+  --popover-foreground: oklch(0.36 0.028 155);
+  --primary: oklch(0.42 0.032 155);            /* #3F5B4B forest header */
+  --primary-foreground: oklch(0.965 0.032 82); /* ivory */
+  --secondary: oklch(0.90 0.030 70);
+  --secondary-foreground: oklch(0.36 0.028 155);
+  --muted: oklch(0.90 0.030 70);
+  --muted-foreground: oklch(0.50 0.020 90);
+  --accent: oklch(0.56 0.145 38);              /* #B54B33 terracotta */
+  --accent-foreground: oklch(0.965 0.032 82);
+  --destructive: oklch(0.56 0.145 38);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.87 0.028 72);
+  --input: oklch(0.88 0.028 72);
+  --ring: oklch(0.56 0.145 38);
+  --gold: oklch(0.72 0.075 75);
+  --forest: oklch(0.42 0.032 155);             /* header green */
+  --forest-deep: oklch(0.28 0.024 155);        /* deeper accent */
+  --terracotta: oklch(0.56 0.145 38);
+  --ivory: oklch(0.965 0.032 82);
+  --ash: oklch(0.65 0.008 90);
+}
+
+.dark {
+  --background: oklch(0.16 0.008 155);
+  --foreground: oklch(0.96 0.010 88);
+  --card: oklch(0.20 0.010 155);
+  --card-foreground: oklch(0.96 0.010 88);
+  --popover: oklch(0.20 0.010 155);
+  --popover-foreground: oklch(0.96 0.010 88);
+  --primary: oklch(0.96 0.010 88);
+  --primary-foreground: oklch(0.16 0.008 155);
+  --secondary: oklch(0.24 0.010 155);
+  --secondary-foreground: oklch(0.96 0.010 88);
+  --muted: oklch(0.24 0.010 155);
+  --muted-foreground: oklch(0.70 0.012 90);
+  --accent: oklch(0.72 0.075 75);
+  --accent-foreground: oklch(0.16 0.008 155);
+  --destructive: oklch(0.62 0.22 27);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.28 0.010 155);
+  --input: oklch(0.28 0.010 155);
+  --ring: oklch(0.72 0.075 75);
+  --gold: oklch(0.72 0.075 75);
+  --forest: oklch(0.20 0.010 155);
+  --ash: oklch(0.55 0.008 90);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html, body {
+    font-family: var(--font-sans);
+    font-weight: 300;
+    letter-spacing: 0.005em;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    background-image:
+      radial-gradient(1200px 800px at 8% -10%, color-mix(in oklab, var(--terracotta) 10%, transparent), transparent 60%),
+      radial-gradient(900px 700px at 110% 10%, color-mix(in oklab, var(--forest) 14%, transparent), transparent 55%),
+      radial-gradient(1000px 900px at 50% 120%, color-mix(in oklab, var(--terracotta) 8%, transparent), transparent 55%);
+    background-attachment: fixed;
+  }
+  .font-serif { font-family: var(--font-serif); }
+  .tracking-editorial { letter-spacing: 0.28em; }
+}
+
+/* ============================================================
+   LIQUID GLASS — material tiers
+   ============================================================ */
+
+@utility glass {
+  background-color: color-mix(in oklab, white 55%, transparent);
+  border: 1px solid color-mix(in oklab, white 65%, transparent);
+  backdrop-filter: blur(24px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255,255,255,0.6),
+    inset 0 -1px 0 0 rgba(255,255,255,0.15),
+    0 10px 40px -20px rgba(28,34,31,0.25),
+    0 2px 6px -2px rgba(28,34,31,0.08);
+}
+
+@utility glass-strong {
+  background-color: color-mix(in oklab, white 72%, transparent);
+  border: 1px solid color-mix(in oklab, white 80%, transparent);
+  backdrop-filter: blur(28px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255,255,255,0.75),
+    inset 0 -1px 0 0 rgba(255,255,255,0.2),
+    0 24px 60px -24px rgba(28,34,31,0.28),
+    0 4px 12px -4px rgba(28,34,31,0.1);
+}
+
+@utility glass-dark {
+  background-color: color-mix(in oklab, var(--forest) 78%, transparent);
+  border: 1px solid color-mix(in oklab, var(--gold) 30%, transparent);
+  backdrop-filter: blur(22px) saturate(150%);
+  color: var(--primary-foreground);
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in oklab, var(--gold) 35%, transparent),
+    0 20px 50px -20px rgba(0,0,0,0.55);
+}
+
+@utility glass-tab {
+  background-color: color-mix(in oklab, white 40%, transparent);
+  border: 1px solid color-mix(in oklab, white 55%, transparent);
+  backdrop-filter: blur(18px) saturate(150%);
+  transition: background-color .35s cubic-bezier(.2,.7,.2,1), color .35s, box-shadow .35s;
+}
+
+@utility hairline {
+  height: 1px;
+  background: color-mix(in oklab, var(--gold) 55%, transparent);
+}
+
+/* Specular shimmer sweep on interactive glass surfaces */
+@utility shimmer {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.shimmer::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(115deg,
+    transparent 30%,
+    color-mix(in oklab, white 55%, transparent) 48%,
+    transparent 66%);
+  transform: translateX(-120%);
+  transition: transform .9s cubic-bezier(.2,.7,.2,1);
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+.shimmer:hover::after, .shimmer:focus-visible::after { transform: translateX(120%); }
+
+/* Fluid press */
+@utility press {
+  transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s;
+}
+.press:active { transform: scale(0.975); }
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-rise { animation: rise .55s cubic-bezier(0.2,0.7,0.2,1) both; }
+.animate-rise-slow { animation: rise .85s cubic-bezier(0.2,0.7,0.2,1) both; }
+
+@keyframes floaty {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.animate-floaty { animation: floaty 6s ease-in-out infinite; }
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--gold) 45%, transparent); }
+  100% { box-shadow: 0 0 0 14px transparent; }
+}
+.animate-pulse-ring { animation: pulse-ring 1.8s ease-out infinite; }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
