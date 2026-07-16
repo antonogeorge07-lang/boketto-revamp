@@ -237,16 +237,13 @@ function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Pro
           </div>
         </div>
 
-        <div
-          ref={scrollerRef}
-          className="no-scrollbar flex gap-5 overflow-x-auto snap-x snap-mandatory pb-4"
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {items.map((p) => (
             <button
               key={p.id}
               onClick={() => !p.soldOut && onOpen(p)}
               disabled={p.soldOut}
-              className={`snap-start shrink-0 w-[82%] sm:w-[380px] text-left group ${p.soldOut ? "opacity-40 blur-[1px] pointer-events-none" : ""}`}
+              className={`text-left group ${p.soldOut ? "opacity-40 blur-[1px] pointer-events-none" : ""}`}
             >
               <div className="glass-strong shimmer press rounded-[28px] p-6 h-full transition-transform group-hover:-translate-y-1">
                 <div className="aspect-[4/3] rounded-2xl mb-5 relative overflow-hidden"
@@ -268,6 +265,7 @@ function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Pro
             </button>
           ))}
         </div>
+
       </div>
     </section>
   );
