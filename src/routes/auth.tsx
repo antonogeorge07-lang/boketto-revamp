@@ -36,14 +36,9 @@ function AuthPage() {
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: next ?? "/" });
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (session) navigate({ to: next ?? "/" });
-    });
-    return () => sub.subscription.unsubscribe();
+    // Auto-redirect on existing session disabled for preview.
   }, [navigate, next]);
+
 
   const signInGoogle = async () => {
     setErr(null);
