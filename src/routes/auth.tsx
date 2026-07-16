@@ -19,7 +19,21 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [err, setErr] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  const forgotPassword = async () => {
+    setErr(null);
+    setInfo(null);
+    if (!email) { setErr("Enter your email above, then tap Forgot password."); return; }
+    setBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + "/reset-password",
+    });
+    setBusy(false);
+    if (error) setErr(error.message);
+    else setInfo("Password reset email sent. Check your inbox.");
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
