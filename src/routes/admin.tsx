@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useRef, useState, type ChangeEvent } from "react";
 import { CATEGORY_META, useStaffAuth, useStore, type Category } from "../lib/store";
+
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
