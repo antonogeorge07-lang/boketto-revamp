@@ -18,8 +18,10 @@ export type Product = {
   soldOut: boolean;
   featured: boolean; // Today's specials
   regular: boolean; // Regulars grid
+  image?: string; // data URL or remote URL
   modifiers?: Modifier[];
 };
+
 
 export type OrderLine = {
   id: string;
@@ -310,10 +312,13 @@ type StoreCtx = {
   updateProduct: (id: string, patch: Partial<Product>) => void;
   toggleSoldOut: (id: string) => void;
   toggleFeatured: (id: string) => void;
+  addProduct: (input: Partial<Product> & { name: string; category: Category }) => Product;
+  removeProduct: (id: string) => void;
   createOrder: (input: { customer: string; table: string; lines: OrderLine[] }) => Order;
   advanceOrder: (id: string) => void;
   archiveOrder: (id: string) => void;
 };
+
 
 const StoreContext = createContext<StoreCtx | null>(null);
 
@@ -384,6 +389,28 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       toggleFeatured: (id) => {
         persistProducts(products.map((p) => (p.id === id ? { ...p, featured: !p.featured } : p)));
       },
+      addProduct: (input) => {
+        const id = `custom_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+        const product: Product = {
+          id,
+          name: input.name,
+          origin: input.origin ?? "",
+          desc: input.desc ?? "",
+          price: input.price ?? 0,
+          category: input.category,
+          soldOut: input.soldOut ?? false,
+          featured: input.featured ?? false,
+          regular: input.regular ?? false,
+          image: input.image,
+          modifiers: input.modifiers,
+        };
+        persistProducts([product, ...products]);
+        return product;
+      },
+      removeProduct: (id) => {
+        persistProducts(products.filter((p) => p.id !== id));
+      },
+
       createOrder: ({ customer, table, lines }) => {
         const now = Date.now();
         const order: Order = {
