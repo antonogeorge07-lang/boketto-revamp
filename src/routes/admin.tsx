@@ -8,7 +8,8 @@ export const Route = createFileRoute("/admin")({
 
 
 function AdminPage() {
-  const { products, updateProduct, toggleSoldOut, toggleFeatured, orders } = useStore();
+  const { products, updateProduct, toggleSoldOut, toggleFeatured, addProduct, removeProduct, orders } = useStore();
+
   const { signOut } = useStaffAuth();
   const navigate = useNavigate();
   const [cat, setCat] = useState<Category | "all">("all");
