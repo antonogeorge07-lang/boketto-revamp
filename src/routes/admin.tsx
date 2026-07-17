@@ -88,23 +88,37 @@ function AdminPage() {
           />
         </div>
 
+        {/* Add new item */}
+        <AddItemForm onAdd={(data) => addProduct(data)} />
+
         {/* Table */}
         <div className="mt-6 glass-strong rounded-[28px] overflow-hidden">
-          <div className="grid grid-cols-[1fr_100px_120px_130px_120px] gap-4 px-6 py-4 text-[10px] tracking-editorial uppercase text-foreground/55 border-b border-foreground/5">
+          <div className="grid grid-cols-[72px_1fr_90px_110px_120px_110px_60px] gap-4 px-6 py-4 text-[10px] tracking-editorial uppercase text-foreground/55 border-b border-foreground/5">
+            <div>Photo</div>
             <div>Item</div>
             <div className="text-right">Price €</div>
             <div className="text-center">Featured</div>
             <div className="text-center">86 switch</div>
             <div className="text-center">Category</div>
+            <div className="text-center">—</div>
           </div>
           <ul className="divide-y divide-foreground/5">
             {filtered.map((p) => (
               <li
                 key={p.id}
-                className={`grid grid-cols-[1fr_100px_120px_130px_120px] gap-4 items-center px-6 py-4 transition-opacity ${p.soldOut ? "opacity-60" : ""}`}
+                className={`grid grid-cols-[72px_1fr_90px_110px_120px_110px_60px] gap-4 items-center px-6 py-4 transition-opacity ${p.soldOut ? "opacity-60" : ""}`}
               >
+                <PhotoCell
+                  image={p.image}
+                  onPick={(dataUrl) => updateProduct(p.id, { image: dataUrl })}
+                  onClear={() => updateProduct(p.id, { image: undefined })}
+                />
                 <div className="min-w-0">
-                  <p className="font-serif text-base leading-tight">{p.name}</p>
+                  <input
+                    value={p.name}
+                    onChange={(e) => updateProduct(p.id, { name: e.target.value })}
+                    className="w-full bg-transparent font-serif text-base leading-tight focus:outline-none"
+                  />
                   <input
                     value={p.origin}
                     onChange={(e) => updateProduct(p.id, { origin: e.target.value })}
@@ -124,8 +138,25 @@ function AdminPage() {
                 <div className="flex justify-center">
                   <Toggle on={!p.soldOut} onChange={() => toggleSoldOut(p.id)} labelOn="In stock" labelOff="86'd" />
                 </div>
-                <div className="text-center text-[10px] tracking-editorial uppercase text-foreground/60">
-                  {CATEGORY_META[p.category].label}
+                <select
+                  value={p.category}
+                  onChange={(e) => updateProduct(p.id, { category: e.target.value as Category })}
+                  className="glass rounded-xl px-2 py-2 text-[10px] tracking-editorial uppercase bg-white/50 focus:outline-none focus:ring-2 focus:ring-[color:var(--gold)]"
+                >
+                  {(Object.keys(CATEGORY_META) as Category[]).map((c) => (
+                    <option key={c} value={c}>{CATEGORY_META[c].label}</option>
+                  ))}
+                </select>
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => {
+                      if (confirm(`Remove "${p.name}" from the menu?`)) removeProduct(p.id);
+                    }}
+                    aria-label={`Remove ${p.name}`}
+                    className="press rounded-full w-8 h-8 flex items-center justify-center text-foreground/60 hover:text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    ✕
+                  </button>
                 </div>
               </li>
             ))}
@@ -134,6 +165,7 @@ function AdminPage() {
             )}
           </ul>
         </div>
+
 
         <p className="mt-8 text-[10px] tracking-editorial uppercase text-foreground/40 text-center">
           Changes sync in real-time to the public storefront and KDS.
