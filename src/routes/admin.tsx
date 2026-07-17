@@ -199,3 +199,150 @@ function Toggle({
     </button>
   );
 }
+
+async function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+function PhotoCell({
+  image, onPick, onClear,
+}: { image?: string; onPick: (dataUrl: string) => void; onClear: () => void }) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const handle = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Please choose an image under 2MB.");
+      e.target.value = "";
+      return;
+    }
+    const url = await fileToDataUrl(file);
+    onPick(url);
+    e.target.value = "";
+  };
+  return (
+    <div className="relative group">
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        className="glass press w-14 h-14 rounded-xl overflow-hidden flex items-center justify-center bg-white/50"
+        aria-label={image ? "Change photo" : "Upload photo"}
+      >
+        {image ? (
+          <img src={image} alt="" className="w-full h-full object-cover" />
+        ) : (
+          <span className="text-[9px] tracking-editorial uppercase text-foreground/50">Upload</span>
+        )}
+      </button>
+      {image && (
+        <button
+          type="button"
+          onClick={onClear}
+          aria-label="Remove photo"
+          className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-foreground text-background text-[9px] leading-none flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          ×
+        </button>
+      )}
+      <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handle} />
+    </div>
+  );
+}
+
+function AddItemForm({
+  onAdd,
+}: {
+  onAdd: (input: { name: string; category: Category; price: number; origin: string; image?: string }) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [origin, setOrigin] = useState("");
+  const [price, setPrice] = useState("");
+  const [category, setCategory] = useState<Category>("bakery");
+  const [image, setImage] = useState<string | undefined>(undefined);
+
+  const reset = () => {
+    setName(""); setOrigin(""); setPrice(""); setCategory("bakery"); setImage(undefined);
+  };
+
+  const submit = () => {
+    if (!name.trim()) { alert("Name is required."); return; }
+    onAdd({ name: name.trim(), origin: origin.trim(), price: parseFloat(price) || 0, category, image });
+    reset();
+    setOpen(false);
+  };
+
+  if (!open) {
+    return (
+      <div className="mt-6 flex justify-end">
+        <button
+          onClick={() => setOpen(true)}
+          className="glass-dark shimmer press rounded-full px-5 py-2 text-[10px] tracking-editorial uppercase"
+        >
+          + Add menu item
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-6 glass-strong rounded-[28px] p-6">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-[10px] tracking-editorial uppercase text-foreground/60">New menu item</p>
+        <button
+          onClick={() => { reset(); setOpen(false); }}
+          className="text-[10px] tracking-editorial uppercase text-foreground/50 hover:text-foreground"
+        >
+          Cancel
+        </button>
+      </div>
+      <div className="grid grid-cols-[72px_1fr_120px_140px_140px_auto] gap-3 items-center">
+        <PhotoCell image={image} onPick={setImage} onClear={() => setImage(undefined)} />
+        <div className="grid gap-1">
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Item name"
+            className="glass rounded-xl px-3 py-2 text-sm bg-white/50 focus:outline-none focus:ring-2 focus:ring-[color:var(--gold)]"
+          />
+          <input
+            value={origin}
+            onChange={(e) => setOrigin(e.target.value)}
+            placeholder="Origin / short tagline"
+            className="glass rounded-xl px-3 py-2 text-[11px] tracking-editorial uppercase bg-white/50 focus:outline-none focus:ring-2 focus:ring-[color:var(--gold)]"
+          />
+        </div>
+        <input
+          type="number"
+          step={0.1}
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          placeholder="€ price"
+          className="glass rounded-xl px-3 py-2 text-sm text-right bg-white/50 focus:outline-none focus:ring-2 focus:ring-[color:var(--gold)]"
+        />
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value as Category)}
+          className="glass rounded-xl px-3 py-2 text-[10px] tracking-editorial uppercase bg-white/50 focus:outline-none focus:ring-2 focus:ring-[color:var(--gold)]"
+        >
+          {(Object.keys(CATEGORY_META) as Category[]).map((c) => (
+            <option key={c} value={c}>{CATEGORY_META[c].label}</option>
+          ))}
+        </select>
+        <button
+          onClick={submit}
+          className="glass-dark shimmer press rounded-full px-5 py-2 text-[10px] tracking-editorial uppercase"
+        >
+          Save item
+        </button>
+      </div>
+    </div>
+  );
+}
+
+}
