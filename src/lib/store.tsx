@@ -312,10 +312,13 @@ type StoreCtx = {
   updateProduct: (id: string, patch: Partial<Product>) => void;
   toggleSoldOut: (id: string) => void;
   toggleFeatured: (id: string) => void;
+  addProduct: (input: Partial<Product> & { name: string; category: Category }) => Product;
+  removeProduct: (id: string) => void;
   createOrder: (input: { customer: string; table: string; lines: OrderLine[] }) => Order;
   advanceOrder: (id: string) => void;
   archiveOrder: (id: string) => void;
 };
+
 
 const StoreContext = createContext<StoreCtx | null>(null);
 
