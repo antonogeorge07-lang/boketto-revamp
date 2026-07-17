@@ -344,5 +344,3 @@ function AddItemForm({
     </div>
   );
 }
-
-}
