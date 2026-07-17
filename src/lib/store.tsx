@@ -18,8 +18,10 @@ export type Product = {
   soldOut: boolean;
   featured: boolean; // Today's specials
   regular: boolean; // Regulars grid
+  image?: string; // data URL or remote URL
   modifiers?: Modifier[];
 };
+
 
 export type OrderLine = {
   id: string;
