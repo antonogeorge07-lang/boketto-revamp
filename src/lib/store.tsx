@@ -306,9 +306,17 @@ function saveOrders(o: Order[]) {
 // CONTEXT
 // ============================================================================
 
+export type SignatureOfDay = {
+  text: string;
+  image?: string;
+  linkedToSocial: boolean;
+};
+
 type StoreCtx = {
   products: Product[];
   orders: Order[];
+  signature: SignatureOfDay;
+  updateSignature: (patch: Partial<SignatureOfDay>) => void;
   updateProduct: (id: string, patch: Partial<Product>) => void;
   toggleSoldOut: (id: string) => void;
   toggleFeatured: (id: string) => void;
@@ -318,6 +326,25 @@ type StoreCtx = {
   advanceOrder: (id: string) => void;
   archiveOrder: (id: string) => void;
 };
+
+const LS_SIGNATURE = "boketto.signature.v1";
+const DEFAULT_SIGNATURE: SignatureOfDay = {
+  text: "Tarta Nohirita — pera caramelizada & pistacho siciliano",
+  image: undefined,
+  linkedToSocial: false,
+};
+function loadSignature(): SignatureOfDay {
+  if (typeof window === "undefined") return DEFAULT_SIGNATURE;
+  try {
+    const raw = localStorage.getItem(LS_SIGNATURE);
+    return raw ? { ...DEFAULT_SIGNATURE, ...(JSON.parse(raw) as SignatureOfDay) } : DEFAULT_SIGNATURE;
+  } catch {
+    return DEFAULT_SIGNATURE;
+  }
+}
+function saveSignature(s: SignatureOfDay) {
+  if (typeof window !== "undefined") localStorage.setItem(LS_SIGNATURE, JSON.stringify(s));
+}
 
 
 const StoreContext = createContext<StoreCtx | null>(null);
