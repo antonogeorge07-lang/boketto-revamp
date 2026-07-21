@@ -39,7 +39,16 @@ function AuthPage() {
   };
 
   useEffect(() => {
-    // Auto-redirect on existing session disabled for preview.
+    let active = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (active && data.session) navigate({ to: next ?? "/" });
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION")) {
+        navigate({ to: next ?? "/" });
+      }
+    });
+    return () => { active = false; sub.subscription.unsubscribe(); };
   }, [navigate, next]);
 
 

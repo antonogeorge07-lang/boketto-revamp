@@ -287,7 +287,22 @@ function loadProducts(): Product[] {
   }
 }
 function saveProducts(p: Product[]) {
-  if (typeof window !== "undefined") localStorage.setItem(LS_PRODUCTS, JSON.stringify(p));
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(LS_PRODUCTS, JSON.stringify(p));
+  } catch (e) {
+    // Quota exceeded — retry without image data URLs so edits still persist.
+    try {
+      const stripped = p.map((x) =>
+        x.image && x.image.startsWith("data:") ? { ...x, image: undefined } : x,
+      );
+      localStorage.setItem(LS_PRODUCTS, JSON.stringify(stripped));
+      if (typeof console !== "undefined") console.warn("Product images dropped from storage due to quota.", e);
+      alert("Storage full — item photos were not saved. Use smaller images or fewer uploads.");
+    } catch {
+      // give up silently; in-memory state remains intact
+    }
+  }
 }
 function loadOrders(): Order[] {
   if (typeof window === "undefined") return [];
@@ -299,7 +314,12 @@ function loadOrders(): Order[] {
   }
 }
 function saveOrders(o: Order[]) {
-  if (typeof window !== "undefined") localStorage.setItem(LS_ORDERS, JSON.stringify(o));
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(LS_ORDERS, JSON.stringify(o));
+  } catch {
+    // ignore
+  }
 }
 
 // ============================================================================
