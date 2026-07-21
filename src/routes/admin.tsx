@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useMemo, useRef, useState, type ChangeEvent, type DragEvent } from "react";
+import { Sparkles, UploadCloud, X, Link2, Link2Off } from "lucide-react";
 import { CATEGORY_META, useStaffAuth, useStore, type Category } from "../lib/store";
 
 
@@ -9,7 +10,7 @@ export const Route = createFileRoute("/admin")({
 
 
 function AdminPage() {
-  const { products, updateProduct, toggleSoldOut, toggleFeatured, addProduct, removeProduct, orders } = useStore();
+  const { products, updateProduct, toggleSoldOut, toggleFeatured, addProduct, removeProduct, orders, signature, updateSignature } = useStore();
 
   const { signOut } = useStaffAuth();
   const navigate = useNavigate();
@@ -64,6 +65,11 @@ function AdminPage() {
           <KPI label="Menu items" value={products.length} />
           <KPI label="Featured" value={products.filter((p) => p.featured).length} />
         </div>
+
+        {/* Today's Specials Control */}
+        <SignatureControl signature={signature} onChange={updateSignature} />
+
+
 
         {/* Filters */}
         <div className="mt-10 flex flex-wrap items-center gap-3">
@@ -342,5 +348,168 @@ function AddItemForm({
         </button>
       </div>
     </div>
+  );
+}
+
+function SignatureControl({
+  signature,
+  onChange,
+}: {
+  signature: { text: string; image?: string; linkedToSocial: boolean };
+  onChange: (patch: Partial<{ text: string; image?: string; linkedToSocial: boolean }>) => void;
+}) {
+  const [dragOver, setDragOver] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleFile = async (file?: File) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { alert("Please choose an image file."); return; }
+    if (file.size > 3 * 1024 * 1024) { alert("Please choose an image under 3MB."); return; }
+    const url = await fileToDataUrl(file);
+    onChange({ image: url });
+  };
+
+  const onDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragOver(false);
+    handleFile(e.dataTransfer.files?.[0]);
+  };
+
+  return (
+    <section className="mt-10 glass-strong rounded-[28px] p-6 md:p-8">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <p className="text-[10px] tracking-editorial uppercase text-foreground/55 flex items-center gap-2">
+            <Sparkles className="w-3.5 h-3.5 text-[color:var(--gold)]" />
+            Today's Specials Control
+          </p>
+          <h2 className="mt-2 font-serif italic text-2xl">Signature of the Day</h2>
+        </div>
+
+        {/* Toggle */}
+        <button
+          type="button"
+          role="switch"
+          aria-checked={signature.linkedToSocial}
+          onClick={() => onChange({ linkedToSocial: !signature.linkedToSocial })}
+          className="press flex items-center gap-3 glass rounded-full pl-3 pr-1.5 py-1.5"
+        >
+          {signature.linkedToSocial ? (
+            <Link2 className="w-3.5 h-3.5 text-[color:var(--gold)]" />
+          ) : (
+            <Link2Off className="w-3.5 h-3.5 text-foreground/40" />
+          )}
+          <span className="text-[10px] tracking-editorial uppercase">
+            Link to social logins
+          </span>
+          <span
+            className={`relative w-10 h-6 rounded-full transition-colors ${
+              signature.linkedToSocial ? "bg-[color:var(--gold)]" : "bg-foreground/15"
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 w-5 h-5 rounded-full bg-background shadow-sm transition-all ${
+                signature.linkedToSocial ? "left-[18px]" : "left-0.5"
+              }`}
+            />
+          </span>
+        </button>
+      </div>
+
+      <div className="mt-6 grid gap-6 md:grid-cols-[1fr_320px]">
+        {/* Text + preview */}
+        <div className="space-y-4">
+          <label className="block">
+            <span className="text-[10px] tracking-editorial uppercase text-foreground/55">
+              Signature copy
+            </span>
+            <input
+              value={signature.text}
+              onChange={(e) => onChange({ text: e.target.value })}
+              placeholder="e.g. Tarta Nohirita — pera caramelizada & pistacho"
+              className="mt-2 w-full glass rounded-2xl px-4 py-3 font-serif italic text-lg bg-white/50 focus:outline-none focus:ring-2 focus:ring-[color:var(--gold)]"
+            />
+          </label>
+
+          {/* Live preview */}
+          <div className="glass rounded-2xl p-4 bg-white/40">
+            <p className="text-[10px] tracking-editorial uppercase text-foreground/55 mb-2">
+              Live preview · social login banner
+            </p>
+            {signature.linkedToSocial ? (
+              <div className="flex items-center gap-4 rounded-xl bg-[color:var(--forest,#1C221F)] text-background p-3">
+                {signature.image ? (
+                  <img src={signature.image} alt="" className="w-14 h-14 rounded-lg object-cover" />
+                ) : (
+                  <div className="w-14 h-14 rounded-lg bg-background/10 grid place-items-center">
+                    <Sparkles className="w-5 h-5 text-[color:var(--gold)]" />
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p className="text-[9px] tracking-editorial uppercase text-background/60">
+                    Today at Boketto
+                  </p>
+                  <p className="font-serif italic text-base truncate">{signature.text || "—"}</p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-foreground/50 italic">
+                Toggle "Link to social logins" to show this banner on the customer sign-in view.
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Uploader */}
+        <div>
+          <span className="text-[10px] tracking-editorial uppercase text-foreground/55">
+            Special photograph
+          </span>
+          <div
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={onDrop}
+            onClick={() => inputRef.current?.click()}
+            className={`mt-2 relative cursor-pointer glass rounded-2xl overflow-hidden aspect-[4/5] flex items-center justify-center transition-all ${
+              dragOver ? "ring-2 ring-[color:var(--gold)]" : ""
+            }`}
+          >
+            {signature.image ? (
+              <>
+                <img src={signature.image} alt="Signature" className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); onChange({ image: undefined }); }}
+                  className="absolute top-2 right-2 w-7 h-7 rounded-full bg-background/90 grid place-items-center press"
+                  aria-label="Remove photograph"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </>
+            ) : (
+              <div className="text-center px-6">
+                <UploadCloud className="w-8 h-8 mx-auto text-foreground/40" />
+                <p className="mt-3 text-[10px] tracking-editorial uppercase text-foreground/60">
+                  Drag & drop
+                </p>
+                <p className="text-[10px] tracking-editorial uppercase text-foreground/40">
+                  or tap to browse
+                </p>
+              </div>
+            )}
+            <input
+              ref={inputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                handleFile(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

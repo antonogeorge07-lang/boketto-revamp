@@ -1,7 +1,9 @@
-import { createFileRoute, redirect, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { useStore } from "@/lib/store";
 
 type Search = { next?: string };
 
@@ -15,6 +17,7 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const { next } = useSearch({ from: "/auth" });
   const navigate = useNavigate();
+  const { signature } = useStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -80,6 +83,23 @@ function AuthPage() {
           </p>
           <div className="hairline w-12 mx-auto mt-5" />
         </div>
+
+        {signature.linkedToSocial && (signature.text || signature.image) && (
+          <div className="mb-5 glass-strong rounded-[24px] overflow-hidden">
+            {signature.image && (
+              <img src={signature.image} alt="" className="w-full h-40 object-cover" />
+            )}
+            <div className="p-4 flex items-center gap-3">
+              <Sparkles className="w-4 h-4 text-[color:var(--gold)] shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[9px] tracking-editorial uppercase text-foreground/55">
+                  Today at Boketto
+                </p>
+                <p className="font-serif italic text-base truncate">{signature.text}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="glass-strong rounded-[28px] p-7 space-y-4">
           <button
