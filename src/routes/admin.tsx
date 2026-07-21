@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useMemo, useRef, useState, type ChangeEvent, type DragEvent } from "react";
+import { Sparkles, UploadCloud, X, Link2, Link2Off } from "lucide-react";
 import { CATEGORY_META, useStaffAuth, useStore, type Category } from "../lib/store";
 
 
