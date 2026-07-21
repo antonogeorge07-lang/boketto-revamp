@@ -375,10 +375,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const onStorage = (e: StorageEvent) => {
       if (e.key === LS_PRODUCTS) setProducts(loadProducts());
       if (e.key === LS_ORDERS) setOrders(loadOrders());
+      if (e.key === LS_SIGNATURE) setSignature(loadSignature());
     };
     const onMsg = (e: MessageEvent) => {
       if (e.data === "products") setProducts(loadProducts());
       if (e.data === "orders") setOrders(loadOrders());
+      if (e.data === "signature") setSignature(loadSignature());
     };
     window.addEventListener("storage", onStorage);
     bc?.addEventListener("message", onMsg);
@@ -389,7 +391,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const broadcast = (kind: "products" | "orders") => {
+  const broadcast = (kind: "products" | "orders" | "signature") => {
     if (typeof window === "undefined") return;
     if ("BroadcastChannel" in window) new BroadcastChannel("boketto").postMessage(kind);
   };
@@ -404,11 +406,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     saveOrders(next);
     broadcast("orders");
   };
+  const persistSignature = (next: SignatureOfDay) => {
+    setSignature(next);
+    saveSignature(next);
+    broadcast("signature");
+  };
 
   const value = useMemo<StoreCtx>(
     () => ({
       products,
       orders,
+      signature,
+      updateSignature: (patch) => persistSignature({ ...signature, ...patch }),
       updateProduct: (id, patch) => {
         persistProducts(products.map((p) => (p.id === id ? { ...p, ...patch } : p)));
       },
