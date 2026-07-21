@@ -66,6 +66,11 @@ function AdminPage() {
           <KPI label="Featured" value={products.filter((p) => p.featured).length} />
         </div>
 
+        {/* Today's Specials Control */}
+        <SignatureControl signature={signature} onChange={updateSignature} />
+
+
+
         {/* Filters */}
         <div className="mt-10 flex flex-wrap items-center gap-3">
           <div className="glass rounded-full p-1 inline-flex flex-wrap gap-1">
