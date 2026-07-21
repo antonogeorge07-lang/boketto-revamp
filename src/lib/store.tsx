@@ -359,11 +359,13 @@ function shortRef(n: number) {
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>(SEED_PRODUCTS);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [signature, setSignature] = useState<SignatureOfDay>(DEFAULT_SIGNATURE);
 
   // hydrate from localStorage after mount (SSR-safe)
   useEffect(() => {
     setProducts(loadProducts());
     setOrders(loadOrders());
+    setSignature(loadSignature());
   }, []);
 
   // cross-tab sync via storage events + BroadcastChannel
