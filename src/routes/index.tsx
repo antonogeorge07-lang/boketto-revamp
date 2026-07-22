@@ -206,6 +206,7 @@ function Hero() {
 // ============================================================================
 function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Product) => void }) {
   const t = useT();
+  const tp = useProductT();
   if (items.length === 0) return null;
 
   return (
@@ -231,7 +232,7 @@ function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Pro
                 <div className="aspect-[4/3] rounded-2xl mb-5 relative overflow-hidden"
                   style={{ background: "linear-gradient(135deg, color-mix(in oklab, var(--gold) 25%, transparent), color-mix(in oklab, var(--forest) 30%, transparent))" }}>
                   {p.image ? (
-                    <img src={p.image} alt={p.name} className="absolute inset-0 w-full h-full object-cover" />
+                    <img src={p.image} alt={tp.name(p)} className="absolute inset-0 w-full h-full object-cover" />
                   ) : (
                     <div className="absolute inset-0 opacity-40" style={{
                       backgroundImage: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), transparent 45%)"
@@ -242,11 +243,11 @@ function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Pro
                   </span>
                 </div>
                 <div className="flex items-baseline justify-between gap-4">
-                  <h3 className="font-serif text-2xl leading-tight">{p.name}</h3>
+                  <h3 className="font-serif text-2xl leading-tight">{tp.name(p)}</h3>
                   <span className="font-serif text-xl text-foreground/70">€{p.price.toFixed(2)}</span>
                 </div>
-                <p className="mt-1 text-[10px] tracking-editorial uppercase text-foreground/50">{p.origin}</p>
-                <p className="mt-3 text-sm text-foreground/70 leading-relaxed line-clamp-3">{p.desc}</p>
+                <p className="mt-1 text-[10px] tracking-editorial uppercase text-foreground/50">{tp.origin(p)}</p>
+                <p className="mt-3 text-sm text-foreground/70 leading-relaxed line-clamp-3">{tp.desc(p)}</p>
               </div>
             </button>
           ))}
