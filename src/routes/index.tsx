@@ -685,11 +685,11 @@ function CartDrawer({
                     <li key={l.id} className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="font-serif text-base leading-tight">
-                          <span className="text-foreground/50 text-sm mr-1">{l.qty}×</span>{l.name}
+                          <span className="text-foreground/50 text-sm mr-1">{l.qty}×</span>{tp.name({ id: l.productId, name: l.name })}
                         </p>
                         {l.modifiers.length > 0 && (
                           <p className="text-[10px] text-foreground/50 mt-0.5">
-                            {l.modifiers.map((m) => m.label).join(" · ")}
+                            {l.modifiers.map((m) => tp.modifier(m)).join(" · ")}
                           </p>
                         )}
                       </div>
