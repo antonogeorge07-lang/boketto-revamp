@@ -230,9 +230,13 @@ function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Pro
               <div className="glass-strong shimmer press rounded-[28px] p-6 h-full transition-transform group-hover:-translate-y-1">
                 <div className="aspect-[4/3] rounded-2xl mb-5 relative overflow-hidden"
                   style={{ background: "linear-gradient(135deg, color-mix(in oklab, var(--gold) 25%, transparent), color-mix(in oklab, var(--forest) 30%, transparent))" }}>
-                  <div className="absolute inset-0 opacity-40" style={{
-                    backgroundImage: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), transparent 45%)"
-                  }} />
+                  {p.image ? (
+                    <img src={p.image} alt={p.name} className="absolute inset-0 w-full h-full object-cover" />
+                  ) : (
+                    <div className="absolute inset-0 opacity-40" style={{
+                      backgroundImage: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), transparent 45%)"
+                    }} />
+                  )}
                   <span className="absolute top-3 left-3 text-[9px] tracking-editorial uppercase glass rounded-full px-2.5 py-1">
                     {t("signature_badge")}
                   </span>
