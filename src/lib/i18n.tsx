@@ -204,6 +204,31 @@ export function tr(v: { es: string; en: string; ja: string }, lang: Lang) {
   return v[lang];
 }
 
+// Convenience hooks that bind the current language automatically.
+import { tProduct, tModifier } from "./i18n-products";
+
+export function useProductT() {
+  const { lang } = useContext(LangCtx);
+  return {
+    name: (p: { id: string; name: string }) => tProduct(p.id, "name", lang, p.name),
+    origin: (p: { id: string; origin: string }) => tProduct(p.id, "origin", lang, p.origin),
+    desc: (p: { id: string; desc: string }) => tProduct(p.id, "desc", lang, p.desc),
+    modifier: (m: { id: string; label: string }) => tModifier(m.id, lang, m.label),
+  };
+}
+
+const CATEGORY_LABEL: Record<string, { es: string; en: string; ja: string }> = {
+  bokematchas: { es: "Bokematchas", en: "Bokematchas", ja: "ボケマッチャ" },
+  coffee: { es: "Café de especialidad", en: "Specialty Coffee", ja: "スペシャルティコーヒー" },
+  bakery: { es: "Panadería artesana", en: "Artisan Bakery", ja: "職人ベーカリー" },
+  brunch: { es: "Brunch", en: "Brunch", ja: "ブランチ" },
+};
+
+export function useCategoryT() {
+  const { lang } = useContext(LangCtx);
+  return (cat: string) => CATEGORY_LABEL[cat]?.[lang] ?? cat;
+}
+
 export function LanguageSwitcher({ tone = "light" }: { tone?: "light" | "dark" }) {
   const { lang, setLang } = useLang();
   const langs: Lang[] = ["es", "en", "ja"];

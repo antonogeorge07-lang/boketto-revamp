@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CATEGORY_META, useStore, type Category, type Modifier, type OrderLine, type Product } from "../lib/store";
-import { LanguageSwitcher, useT } from "../lib/i18n";
+import { LanguageSwitcher, useT, useProductT, useCategoryT } from "../lib/i18n";
 import { BKLogo } from "../components/BKLogo";
 import galleryInterior from "../assets/gallery-interior.jpg";
 import galleryMatcha from "../assets/gallery-matcha.jpg";
@@ -206,6 +206,7 @@ function Hero() {
 // ============================================================================
 function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Product) => void }) {
   const t = useT();
+  const tp = useProductT();
   if (items.length === 0) return null;
 
   return (
@@ -231,7 +232,7 @@ function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Pro
                 <div className="aspect-[4/3] rounded-2xl mb-5 relative overflow-hidden"
                   style={{ background: "linear-gradient(135deg, color-mix(in oklab, var(--gold) 25%, transparent), color-mix(in oklab, var(--forest) 30%, transparent))" }}>
                   {p.image ? (
-                    <img src={p.image} alt={p.name} className="absolute inset-0 w-full h-full object-cover" />
+                    <img src={p.image} alt={tp.name(p)} className="absolute inset-0 w-full h-full object-cover" />
                   ) : (
                     <div className="absolute inset-0 opacity-40" style={{
                       backgroundImage: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), transparent 45%)"
@@ -242,11 +243,11 @@ function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Pro
                   </span>
                 </div>
                 <div className="flex items-baseline justify-between gap-4">
-                  <h3 className="font-serif text-2xl leading-tight">{p.name}</h3>
+                  <h3 className="font-serif text-2xl leading-tight">{tp.name(p)}</h3>
                   <span className="font-serif text-xl text-foreground/70">€{p.price.toFixed(2)}</span>
                 </div>
-                <p className="mt-1 text-[10px] tracking-editorial uppercase text-foreground/50">{p.origin}</p>
-                <p className="mt-3 text-sm text-foreground/70 leading-relaxed line-clamp-3">{p.desc}</p>
+                <p className="mt-1 text-[10px] tracking-editorial uppercase text-foreground/50">{tp.origin(p)}</p>
+                <p className="mt-3 text-sm text-foreground/70 leading-relaxed line-clamp-3">{tp.desc(p)}</p>
               </div>
             </button>
           ))}
@@ -262,6 +263,7 @@ function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Pro
 // ============================================================================
 function RegularsGrid({ items, onOpen }: { items: Product[]; onOpen: (p: Product) => void }) {
   const t = useT();
+  const tp = useProductT();
   if (items.length === 0) return null;
   return (
     <section className="px-4 sm:px-8 py-12">
@@ -282,14 +284,14 @@ function RegularsGrid({ items, onOpen }: { items: Product[]; onOpen: (p: Product
             >
               {p.image && (
                 <div className="aspect-[4/3] rounded-xl mb-3 overflow-hidden">
-                  <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                  <img src={p.image} alt={tp.name(p)} className="w-full h-full object-cover" />
                 </div>
               )}
               <div className="flex items-center justify-between">
-                <span className="font-serif text-base leading-tight">{p.name}</span>
+                <span className="font-serif text-base leading-tight">{tp.name(p)}</span>
                 <span className="text-xs text-foreground/60">€{p.price.toFixed(2)}</span>
               </div>
-              <p className="mt-1 text-[9px] tracking-editorial uppercase text-foreground/45 line-clamp-1">{p.origin}</p>
+              <p className="mt-1 text-[9px] tracking-editorial uppercase text-foreground/45 line-clamp-1">{tp.origin(p)}</p>
             </button>
           ))}
         </div>
@@ -307,6 +309,8 @@ function MenuSection({
   cat: Category; setCat: (c: Category) => void; items: Product[]; onOpen: (p: Product) => void;
 }) {
   const t = useT();
+  const tp = useProductT();
+  const tc = useCategoryT();
   const cats: Category[] = ["bokematchas", "coffee", "bakery", "brunch"];
   return (
     <section id="menu" className="px-4 sm:px-8 py-16">
@@ -329,7 +333,7 @@ function MenuSection({
                   active ? "glass-dark" : "bg-transparent border-transparent"
                 }`}
               >
-                {CATEGORY_META[c].label}
+                {tc(c)}
               </button>
             );
           })}
@@ -345,15 +349,15 @@ function MenuSection({
             >
               {p.image && (
                 <div className="aspect-[16/9] rounded-2xl mb-4 overflow-hidden">
-                  <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                  <img src={p.image} alt={tp.name(p)} className="w-full h-full object-cover" />
                 </div>
               )}
               <div className="flex items-baseline justify-between gap-4">
-                <h3 className="font-serif text-xl leading-tight">{p.name}</h3>
+                <h3 className="font-serif text-xl leading-tight">{tp.name(p)}</h3>
                 <span className="font-serif text-lg text-foreground/70">€{p.price.toFixed(2)}</span>
               </div>
-              <p className="mt-1 text-[9px] tracking-editorial uppercase text-foreground/45">{p.origin}</p>
-              <p className="mt-3 text-sm text-foreground/65 leading-relaxed">{p.desc}</p>
+              <p className="mt-1 text-[9px] tracking-editorial uppercase text-foreground/45">{tp.origin(p)}</p>
+              <p className="mt-3 text-sm text-foreground/65 leading-relaxed">{tp.desc(p)}</p>
               {p.modifiers && p.modifiers.length > 0 && (
                 <p className="mt-3 text-[10px] tracking-editorial uppercase text-foreground/45">
                   {p.modifiers.length} {p.modifiers.length > 1 ? t("options_label") : t("option_label")}
@@ -511,6 +515,7 @@ function CustomizerDrawer({
   product: Product; onClose: () => void; onAdd: (l: DraftLine) => void;
 }) {
   const t = useT();
+  const tp = useProductT();
   const [milk, setMilk] = useState<string>("");
   const [dietary, setDietary] = useState<Record<string, boolean>>({});
   const [qty, setQty] = useState(1);
@@ -538,9 +543,9 @@ function CustomizerDrawer({
       <div className="glass-strong relative w-full sm:max-w-lg rounded-t-[32px] sm:rounded-[32px] p-7 max-h-[85svh] overflow-y-auto">
         <div className="mx-auto h-1 w-10 rounded-full bg-foreground/15 sm:hidden mb-5" />
         <p className="text-[10px] tracking-editorial uppercase text-foreground/50">{t("customize")}</p>
-        <h3 className="mt-2 font-serif text-3xl">{product.name}</h3>
-        <p className="mt-1 text-[10px] tracking-editorial uppercase text-foreground/45">{product.origin}</p>
-        <p className="mt-4 text-sm text-foreground/70 leading-relaxed">{product.desc}</p>
+        <h3 className="mt-2 font-serif text-3xl">{tp.name(product)}</h3>
+        <p className="mt-1 text-[10px] tracking-editorial uppercase text-foreground/45">{tp.origin(product)}</p>
+        <p className="mt-4 text-sm text-foreground/70 leading-relaxed">{tp.desc(product)}</p>
 
         {milkOpts.length > 0 && (
           <div className="mt-6">
@@ -554,7 +559,7 @@ function CustomizerDrawer({
                     milk === m.id ? "glass-dark" : ""
                   }`}
                 >
-                  <div className="font-medium">{m.label.replace(" milk", "")}</div>
+                  <div className="font-medium">{tp.modifier(m).replace(/\s*(milk|leche|ミルク)$/i, "")}</div>
                   {m.price > 0 && <div className="text-[10px] opacity-70 mt-0.5">+€{m.price.toFixed(2)}</div>}
                 </button>
               ))}
@@ -574,7 +579,7 @@ function CustomizerDrawer({
                     checked={!!dietary[m.id]}
                     onChange={(e) => setDietary((d) => ({ ...d, [m.id]: e.target.checked }))}
                   />
-                  {m.label} {m.price > 0 && <span className="opacity-70">+€{m.price.toFixed(2)}</span>}
+                  {tp.modifier(m)} {m.price > 0 && <span className="opacity-70">+€{m.price.toFixed(2)}</span>}
                 </label>
               ))}
             </div>
@@ -593,7 +598,7 @@ function CustomizerDrawer({
                     checked={!!others[m.id]}
                     onChange={(e) => setOthers((d) => ({ ...d, [m.id]: e.target.checked }))}
                   />
-                  {m.label} {m.price > 0 && <span className="opacity-70">+€{m.price.toFixed(2)}</span>}
+                  {tp.modifier(m)} {m.price > 0 && <span className="opacity-70">+€{m.price.toFixed(2)}</span>}
                 </label>
               ))}
             </div>
@@ -646,6 +651,7 @@ function CartDrawer({
   onCheckout: () => void;
 }) {
   const t = useT();
+  const tp = useProductT();
   const count = lines.reduce((n, l) => n + l.qty, 0);
   return (
     <div className={`fixed inset-x-0 bottom-0 z-40 pointer-events-none`}>
@@ -679,11 +685,11 @@ function CartDrawer({
                     <li key={l.id} className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="font-serif text-base leading-tight">
-                          <span className="text-foreground/50 text-sm mr-1">{l.qty}×</span>{l.name}
+                          <span className="text-foreground/50 text-sm mr-1">{l.qty}×</span>{tp.name({ id: l.productId, name: l.name })}
                         </p>
                         {l.modifiers.length > 0 && (
                           <p className="text-[10px] text-foreground/50 mt-0.5">
-                            {l.modifiers.map((m) => m.label).join(" · ")}
+                            {l.modifiers.map((m) => tp.modifier(m)).join(" · ")}
                           </p>
                         )}
                       </div>
