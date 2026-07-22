@@ -343,6 +343,11 @@ function MenuSection({
               disabled={p.soldOut}
               className={`glass shimmer press text-left rounded-3xl p-6 transition-all hover:-translate-y-0.5 ${p.soldOut ? "opacity-40 blur-[1px] pointer-events-none" : ""}`}
             >
+              {p.image && (
+                <div className="aspect-[16/9] rounded-2xl mb-4 overflow-hidden">
+                  <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                </div>
+              )}
               <div className="flex items-baseline justify-between gap-4">
                 <h3 className="font-serif text-xl leading-tight">{p.name}</h3>
                 <span className="font-serif text-lg text-foreground/70">€{p.price.toFixed(2)}</span>
