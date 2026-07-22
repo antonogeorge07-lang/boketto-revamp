@@ -263,6 +263,7 @@ function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Pro
 // ============================================================================
 function RegularsGrid({ items, onOpen }: { items: Product[]; onOpen: (p: Product) => void }) {
   const t = useT();
+  const tp = useProductT();
   if (items.length === 0) return null;
   return (
     <section className="px-4 sm:px-8 py-12">
@@ -283,14 +284,14 @@ function RegularsGrid({ items, onOpen }: { items: Product[]; onOpen: (p: Product
             >
               {p.image && (
                 <div className="aspect-[4/3] rounded-xl mb-3 overflow-hidden">
-                  <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                  <img src={p.image} alt={tp.name(p)} className="w-full h-full object-cover" />
                 </div>
               )}
               <div className="flex items-center justify-between">
-                <span className="font-serif text-base leading-tight">{p.name}</span>
+                <span className="font-serif text-base leading-tight">{tp.name(p)}</span>
                 <span className="text-xs text-foreground/60">€{p.price.toFixed(2)}</span>
               </div>
-              <p className="mt-1 text-[9px] tracking-editorial uppercase text-foreground/45 line-clamp-1">{p.origin}</p>
+              <p className="mt-1 text-[9px] tracking-editorial uppercase text-foreground/45 line-clamp-1">{tp.origin(p)}</p>
             </button>
           ))}
         </div>
