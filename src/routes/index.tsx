@@ -309,6 +309,8 @@ function MenuSection({
   cat: Category; setCat: (c: Category) => void; items: Product[]; onOpen: (p: Product) => void;
 }) {
   const t = useT();
+  const tp = useProductT();
+  const tc = useCategoryT();
   const cats: Category[] = ["bokematchas", "coffee", "bakery", "brunch"];
   return (
     <section id="menu" className="px-4 sm:px-8 py-16">
@@ -331,7 +333,7 @@ function MenuSection({
                   active ? "glass-dark" : "bg-transparent border-transparent"
                 }`}
               >
-                {CATEGORY_META[c].label}
+                {tc(c)}
               </button>
             );
           })}
@@ -347,15 +349,15 @@ function MenuSection({
             >
               {p.image && (
                 <div className="aspect-[16/9] rounded-2xl mb-4 overflow-hidden">
-                  <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                  <img src={p.image} alt={tp.name(p)} className="w-full h-full object-cover" />
                 </div>
               )}
               <div className="flex items-baseline justify-between gap-4">
-                <h3 className="font-serif text-xl leading-tight">{p.name}</h3>
+                <h3 className="font-serif text-xl leading-tight">{tp.name(p)}</h3>
                 <span className="font-serif text-lg text-foreground/70">€{p.price.toFixed(2)}</span>
               </div>
-              <p className="mt-1 text-[9px] tracking-editorial uppercase text-foreground/45">{p.origin}</p>
-              <p className="mt-3 text-sm text-foreground/65 leading-relaxed">{p.desc}</p>
+              <p className="mt-1 text-[9px] tracking-editorial uppercase text-foreground/45">{tp.origin(p)}</p>
+              <p className="mt-3 text-sm text-foreground/65 leading-relaxed">{tp.desc(p)}</p>
               {p.modifiers && p.modifiers.length > 0 && (
                 <p className="mt-3 text-[10px] tracking-editorial uppercase text-foreground/45">
                   {p.modifiers.length} {p.modifiers.length > 1 ? t("options_label") : t("option_label")}
