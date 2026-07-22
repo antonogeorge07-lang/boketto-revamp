@@ -579,7 +579,7 @@ function CustomizerDrawer({
                     checked={!!dietary[m.id]}
                     onChange={(e) => setDietary((d) => ({ ...d, [m.id]: e.target.checked }))}
                   />
-                  {m.label} {m.price > 0 && <span className="opacity-70">+€{m.price.toFixed(2)}</span>}
+                  {tp.modifier(m)} {m.price > 0 && <span className="opacity-70">+€{m.price.toFixed(2)}</span>}
                 </label>
               ))}
             </div>
