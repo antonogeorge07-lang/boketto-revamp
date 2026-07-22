@@ -230,9 +230,13 @@ function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Pro
               <div className="glass-strong shimmer press rounded-[28px] p-6 h-full transition-transform group-hover:-translate-y-1">
                 <div className="aspect-[4/3] rounded-2xl mb-5 relative overflow-hidden"
                   style={{ background: "linear-gradient(135deg, color-mix(in oklab, var(--gold) 25%, transparent), color-mix(in oklab, var(--forest) 30%, transparent))" }}>
-                  <div className="absolute inset-0 opacity-40" style={{
-                    backgroundImage: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), transparent 45%)"
-                  }} />
+                  {p.image ? (
+                    <img src={p.image} alt={p.name} className="absolute inset-0 w-full h-full object-cover" />
+                  ) : (
+                    <div className="absolute inset-0 opacity-40" style={{
+                      backgroundImage: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), transparent 45%)"
+                    }} />
+                  )}
                   <span className="absolute top-3 left-3 text-[9px] tracking-editorial uppercase glass rounded-full px-2.5 py-1">
                     {t("signature_badge")}
                   </span>
@@ -276,6 +280,11 @@ function RegularsGrid({ items, onOpen }: { items: Product[]; onOpen: (p: Product
               disabled={p.soldOut}
               className={`glass shimmer press rounded-2xl p-4 text-left transition-transform hover:-translate-y-0.5 ${p.soldOut ? "opacity-40 blur-[1px] pointer-events-none" : ""}`}
             >
+              {p.image && (
+                <div className="aspect-[4/3] rounded-xl mb-3 overflow-hidden">
+                  <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                </div>
+              )}
               <div className="flex items-center justify-between">
                 <span className="font-serif text-base leading-tight">{p.name}</span>
                 <span className="text-xs text-foreground/60">€{p.price.toFixed(2)}</span>
@@ -334,6 +343,11 @@ function MenuSection({
               disabled={p.soldOut}
               className={`glass shimmer press text-left rounded-3xl p-6 transition-all hover:-translate-y-0.5 ${p.soldOut ? "opacity-40 blur-[1px] pointer-events-none" : ""}`}
             >
+              {p.image && (
+                <div className="aspect-[16/9] rounded-2xl mb-4 overflow-hidden">
+                  <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                </div>
+              )}
               <div className="flex items-baseline justify-between gap-4">
                 <h3 className="font-serif text-xl leading-tight">{p.name}</h3>
                 <span className="font-serif text-lg text-foreground/70">€{p.price.toFixed(2)}</span>
