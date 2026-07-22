@@ -280,6 +280,11 @@ function RegularsGrid({ items, onOpen }: { items: Product[]; onOpen: (p: Product
               disabled={p.soldOut}
               className={`glass shimmer press rounded-2xl p-4 text-left transition-transform hover:-translate-y-0.5 ${p.soldOut ? "opacity-40 blur-[1px] pointer-events-none" : ""}`}
             >
+              {p.image && (
+                <div className="aspect-[4/3] rounded-xl mb-3 overflow-hidden">
+                  <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                </div>
+              )}
               <div className="flex items-center justify-between">
                 <span className="font-serif text-base leading-tight">{p.name}</span>
                 <span className="text-xs text-foreground/60">€{p.price.toFixed(2)}</span>
