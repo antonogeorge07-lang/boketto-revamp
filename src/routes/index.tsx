@@ -559,7 +559,7 @@ function CustomizerDrawer({
                     milk === m.id ? "glass-dark" : ""
                   }`}
                 >
-                  <div className="font-medium">{m.label.replace(" milk", "")}</div>
+                  <div className="font-medium">{tp.modifier(m).replace(/\s*(milk|leche|ミルク)$/i, "")}</div>
                   {m.price > 0 && <div className="text-[10px] opacity-70 mt-0.5">+€{m.price.toFixed(2)}</div>}
                 </button>
               ))}
