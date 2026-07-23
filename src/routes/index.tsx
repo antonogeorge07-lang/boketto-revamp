@@ -330,7 +330,7 @@ function MenuSection({
                 key={c}
                 onClick={() => setCat(c)}
                 className={`glass-tab shimmer press rounded-full px-5 py-2.5 text-[10px] tracking-editorial uppercase transition-all ${
-                  active ? "glass-dark" : "bg-transparent border-transparent"
+                  active ? "glass-dark bg-[#3F5B4B] text-[#FAF8F5] shadow-md" : "bg-transparent border-transparent text-foreground/70"
                 }`}
               >
                 {tc(c)}
