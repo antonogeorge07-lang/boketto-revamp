@@ -12,6 +12,17 @@ const BOKETTO_PASTRY_HERO = "https://bokettopastry.com/wp-content/uploads/2025/1
 const BOKETTO_SIGNATURE = "https://bokettopastry.com/wp-content/uploads/2025/12/WhatsApp-Image-2025-12-28-at-13.04.17-1024x768.jpeg";
 const MAPS_URL = "https://www.google.com/maps/place/Boketto+Specialty+Coffee/@39.4725533,-0.3824784,17z";
 
+// Order flow (cart / checkout / in-app ordering) is intentionally disabled.
+// Boketto currently manages orders & reservations directly over WhatsApp.
+// Admin can flip this flag back to `true` to re-enable the full ordering UI —
+// all cart / customizer / checkout code is preserved in git below.
+export const ORDER_UI_ENABLED = false;
+export const WHATSAPP_NUMBER = "34614191802";
+
+function whatsappLink(message: string) {
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
 export const Route = createFileRoute("/")({
   component: PublicStorefront,
 });
