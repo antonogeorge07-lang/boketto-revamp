@@ -12,17 +12,6 @@ const BOKETTO_PASTRY_HERO = "https://bokettopastry.com/wp-content/uploads/2025/1
 const BOKETTO_SIGNATURE = "https://bokettopastry.com/wp-content/uploads/2025/12/WhatsApp-Image-2025-12-28-at-13.04.17-1024x768.jpeg";
 const MAPS_URL = "https://www.google.com/maps/place/Boketto+Specialty+Coffee/@39.4725533,-0.3824784,17z";
 
-// Order flow (cart / checkout / in-app ordering) is intentionally disabled.
-// Boketto currently manages orders & reservations directly over WhatsApp.
-// Admin can flip this flag back to `true` to re-enable the full ordering UI —
-// all cart / customizer / checkout code is preserved in git below.
-export const ORDER_UI_ENABLED = false;
-export const WHATSAPP_NUMBER = "34614191802";
-
-function whatsappLink(message: string) {
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-}
-
 export const Route = createFileRoute("/")({
   component: PublicStorefront,
 });
@@ -67,31 +56,17 @@ function PublicStorefront() {
     setCartOpen(false);
   };
 
-  // When in-app ordering is disabled, tapping a product opens WhatsApp
-  // pre-filled with the item name so the barista can take the order there.
-  const handleOpen = (p: Product) => {
-    if (!ORDER_UI_ENABLED) {
-      window.open(
-        whatsappLink(`Hola Boketto, me gustaría pedir: ${p.name} (€${p.price.toFixed(2)}).`),
-        "_blank",
-        "noreferrer",
-      );
-      return;
-    }
-    setDrawerFor(p);
-  };
-
   return (
     <div className="min-h-screen text-foreground pb-40">
       <FloatingNav />
 
       <Hero />
 
-      <SpecialsCarousel items={specials} onOpen={handleOpen} />
+      <SpecialsCarousel items={specials} onOpen={(p) => setDrawerFor(p)} />
 
-      <RegularsGrid items={regulars} onOpen={handleOpen} />
+      <RegularsGrid items={regulars} onOpen={(p) => setDrawerFor(p)} />
 
-      <MenuSection cat={cat} setCat={setCat} items={catalog} onOpen={handleOpen} />
+      <MenuSection cat={cat} setCat={setCat} items={catalog} onOpen={(p) => setDrawerFor(p)} />
 
       <GallerySection />
 
@@ -99,7 +74,7 @@ function PublicStorefront() {
 
       <Footer />
 
-      {ORDER_UI_ENABLED && drawerFor && (
+      {drawerFor && (
         <CustomizerDrawer
           product={drawerFor}
           onClose={() => setDrawerFor(null)}
@@ -107,7 +82,7 @@ function PublicStorefront() {
         />
       )}
 
-      {ORDER_UI_ENABLED && cartCount > 0 && !checkout && !confirmed && (
+      {cartCount > 0 && !checkout && !confirmed && (
         <CartDrawer
           open={cartOpen}
           setOpen={setCartOpen}
@@ -118,7 +93,7 @@ function PublicStorefront() {
         />
       )}
 
-      {ORDER_UI_ENABLED && checkout && (
+      {checkout && (
         <CheckoutSheet
           value={checkout}
           setValue={setCheckout}
@@ -128,7 +103,7 @@ function PublicStorefront() {
         />
       )}
 
-      {ORDER_UI_ENABLED && confirmed && (
+      {confirmed && (
         <ConfirmSheet
           ref_={confirmed.ref}
           name={confirmed.name}
@@ -163,9 +138,7 @@ function FloatingNav() {
         <span className="hidden sm:block h-4 w-px bg-[color:var(--ivory)]/25" />
         <LanguageSwitcher tone="dark" />
         <a
-          href={ORDER_UI_ENABLED ? "#menu" : whatsappLink("Hola Boketto, me gustaría hacer un pedido.")}
-          target={ORDER_UI_ENABLED ? undefined : "_blank"}
-          rel={ORDER_UI_ENABLED ? undefined : "noreferrer"}
+          href="#menu"
           className="ml-1 press rounded-full px-4 py-2 text-[10px] tracking-editorial uppercase"
           style={{ backgroundColor: "var(--terracotta)", color: "var(--ivory)" }}
         >
