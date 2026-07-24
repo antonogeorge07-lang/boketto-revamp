@@ -163,7 +163,9 @@ function FloatingNav() {
         <span className="hidden sm:block h-4 w-px bg-[color:var(--ivory)]/25" />
         <LanguageSwitcher tone="dark" />
         <a
-          href="#menu"
+          href={ORDER_UI_ENABLED ? "#menu" : whatsappLink("Hola Boketto, me gustaría hacer un pedido.")}
+          target={ORDER_UI_ENABLED ? undefined : "_blank"}
+          rel={ORDER_UI_ENABLED ? undefined : "noreferrer"}
           className="ml-1 press rounded-full px-4 py-2 text-[10px] tracking-editorial uppercase"
           style={{ backgroundColor: "var(--terracotta)", color: "var(--ivory)" }}
         >
