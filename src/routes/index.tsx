@@ -67,17 +67,31 @@ function PublicStorefront() {
     setCartOpen(false);
   };
 
+  // When in-app ordering is disabled, tapping a product opens WhatsApp
+  // pre-filled with the item name so the barista can take the order there.
+  const handleOpen = (p: Product) => {
+    if (!ORDER_UI_ENABLED) {
+      window.open(
+        whatsappLink(`Hola Boketto, me gustaría pedir: ${p.name} (€${p.price.toFixed(2)}).`),
+        "_blank",
+        "noreferrer",
+      );
+      return;
+    }
+    setDrawerFor(p);
+  };
+
   return (
     <div className="min-h-screen text-foreground pb-40">
       <FloatingNav />
 
       <Hero />
 
-      <SpecialsCarousel items={specials} onOpen={(p) => setDrawerFor(p)} />
+      <SpecialsCarousel items={specials} onOpen={handleOpen} />
 
-      <RegularsGrid items={regulars} onOpen={(p) => setDrawerFor(p)} />
+      <RegularsGrid items={regulars} onOpen={handleOpen} />
 
-      <MenuSection cat={cat} setCat={setCat} items={catalog} onOpen={(p) => setDrawerFor(p)} />
+      <MenuSection cat={cat} setCat={setCat} items={catalog} onOpen={handleOpen} />
 
       <GallerySection />
 
@@ -85,7 +99,7 @@ function PublicStorefront() {
 
       <Footer />
 
-      {drawerFor && (
+      {ORDER_UI_ENABLED && drawerFor && (
         <CustomizerDrawer
           product={drawerFor}
           onClose={() => setDrawerFor(null)}
@@ -93,7 +107,7 @@ function PublicStorefront() {
         />
       )}
 
-      {cartCount > 0 && !checkout && !confirmed && (
+      {ORDER_UI_ENABLED && cartCount > 0 && !checkout && !confirmed && (
         <CartDrawer
           open={cartOpen}
           setOpen={setCartOpen}
@@ -104,7 +118,7 @@ function PublicStorefront() {
         />
       )}
 
-      {checkout && (
+      {ORDER_UI_ENABLED && checkout && (
         <CheckoutSheet
           value={checkout}
           setValue={setCheckout}
@@ -114,7 +128,7 @@ function PublicStorefront() {
         />
       )}
 
-      {confirmed && (
+      {ORDER_UI_ENABLED && confirmed && (
         <ConfirmSheet
           ref_={confirmed.ref}
           name={confirmed.name}
