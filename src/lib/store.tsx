@@ -445,10 +445,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     saveOrders(next);
     broadcast("orders");
   };
-  const persistSignature = (next: SignatureOfDay) => {
-    setSignature(next);
-    saveSignature(next);
-    broadcast("signature");
+  const persistOrdering = (v: boolean) => {
+    setOrderingEnabledState(v);
+    saveOrderingEnabled(v);
+    broadcast("ordering");
   };
 
   const value = useMemo<StoreCtx>(
@@ -456,6 +456,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       products,
       orders,
       signature,
+      orderingEnabled,
+      setOrderingEnabled: persistOrdering,
       updateSignature: (patch) => persistSignature({ ...signature, ...patch }),
       updateProduct: (id, patch) => {
         persistProducts(products.map((p) => (p.id === id ? { ...p, ...patch } : p)));
