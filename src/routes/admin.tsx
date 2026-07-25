@@ -10,7 +10,7 @@ export const Route = createFileRoute("/admin")({
 
 
 function AdminPage() {
-  const { products, updateProduct, toggleSoldOut, toggleFeatured, addProduct, removeProduct, orders, signature, updateSignature } = useStore();
+  const { products, updateProduct, toggleSoldOut, toggleFeatured, addProduct, removeProduct, orders, signature, updateSignature, orderingEnabled, setOrderingEnabled } = useStore();
 
   const { signOut } = useStaffAuth();
   const navigate = useNavigate();
