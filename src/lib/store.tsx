@@ -395,12 +395,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>(SEED_PRODUCTS);
   const [orders, setOrders] = useState<Order[]>([]);
   const [signature, setSignature] = useState<SignatureOfDay>(DEFAULT_SIGNATURE);
+  const [orderingEnabled, setOrderingEnabledState] = useState<boolean>(false);
 
   // hydrate from localStorage after mount (SSR-safe)
   useEffect(() => {
     setProducts(loadProducts());
     setOrders(loadOrders());
     setSignature(loadSignature());
+    setOrderingEnabledState(loadOrderingEnabled());
   }, []);
 
   // cross-tab sync via storage events + BroadcastChannel
@@ -411,11 +413,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       if (e.key === LS_PRODUCTS) setProducts(loadProducts());
       if (e.key === LS_ORDERS) setOrders(loadOrders());
       if (e.key === LS_SIGNATURE) setSignature(loadSignature());
+      if (e.key === LS_ORDERING) setOrderingEnabledState(loadOrderingEnabled());
     };
     const onMsg = (e: MessageEvent) => {
       if (e.data === "products") setProducts(loadProducts());
       if (e.data === "orders") setOrders(loadOrders());
       if (e.data === "signature") setSignature(loadSignature());
+      if (e.data === "ordering") setOrderingEnabledState(loadOrderingEnabled());
     };
     window.addEventListener("storage", onStorage);
     bc?.addEventListener("message", onMsg);
@@ -426,7 +430,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const broadcast = (kind: "products" | "orders" | "signature") => {
+  const broadcast = (kind: "products" | "orders" | "signature" | "ordering") => {
     if (typeof window === "undefined") return;
     if ("BroadcastChannel" in window) new BroadcastChannel("boketto").postMessage(kind);
   };
