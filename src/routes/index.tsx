@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
 type DraftLine = OrderLine;
 
 function PublicStorefront() {
-  const { products, createOrder } = useStore();
+  const { products, createOrder, orderingEnabled } = useStore();
   const [cat, setCat] = useState<Category>("bokematchas");
   const [drawerFor, setDrawerFor] = useState<Product | null>(null);
   const [cart, setCart] = useState<DraftLine[]>([]);
@@ -58,15 +58,15 @@ function PublicStorefront() {
 
   return (
     <div className="min-h-screen text-foreground pb-40">
-      <FloatingNav />
+      <FloatingNav orderingEnabled={orderingEnabled} />
 
       <Hero />
 
-      <SpecialsCarousel items={specials} onOpen={(p) => setDrawerFor(p)} />
+      <SpecialsCarousel items={specials} onOpen={(p) => orderingEnabled && setDrawerFor(p)} />
 
-      <RegularsGrid items={regulars} onOpen={(p) => setDrawerFor(p)} />
+      <RegularsGrid items={regulars} onOpen={(p) => orderingEnabled && setDrawerFor(p)} />
 
-      <MenuSection cat={cat} setCat={setCat} items={catalog} onOpen={(p) => setDrawerFor(p)} />
+      <MenuSection cat={cat} setCat={setCat} items={catalog} onOpen={(p) => orderingEnabled && setDrawerFor(p)} />
 
       <GallerySection />
 
@@ -74,7 +74,7 @@ function PublicStorefront() {
 
       <Footer />
 
-      {drawerFor && (
+      {orderingEnabled && drawerFor && (
         <CustomizerDrawer
           product={drawerFor}
           onClose={() => setDrawerFor(null)}
@@ -82,7 +82,7 @@ function PublicStorefront() {
         />
       )}
 
-      {cartCount > 0 && !checkout && !confirmed && (
+      {orderingEnabled && cartCount > 0 && !checkout && !confirmed && (
         <CartDrawer
           open={cartOpen}
           setOpen={setCartOpen}
@@ -93,7 +93,7 @@ function PublicStorefront() {
         />
       )}
 
-      {checkout && (
+      {orderingEnabled && checkout && (
         <CheckoutSheet
           value={checkout}
           setValue={setCheckout}
@@ -103,7 +103,7 @@ function PublicStorefront() {
         />
       )}
 
-      {confirmed && (
+      {orderingEnabled && confirmed && (
         <ConfirmSheet
           ref_={confirmed.ref}
           name={confirmed.name}
@@ -117,7 +117,7 @@ function PublicStorefront() {
 // ============================================================================
 // FLOATING GLASS NAV
 // ============================================================================
-function FloatingNav() {
+function FloatingNav({ orderingEnabled }: { orderingEnabled: boolean }) {
   const t = useT();
   return (
     <header className="fixed top-4 inset-x-4 z-40 flex justify-center pointer-events-none">
@@ -137,13 +137,15 @@ function FloatingNav() {
         </span>
         <span className="hidden sm:block h-4 w-px bg-[color:var(--ivory)]/25" />
         <LanguageSwitcher tone="dark" />
-        <a
-          href="#menu"
-          className="ml-1 press rounded-full px-4 py-2 text-[10px] tracking-editorial uppercase"
-          style={{ backgroundColor: "var(--terracotta)", color: "var(--ivory)" }}
-        >
-          {t("place_order")}
-        </a>
+        {orderingEnabled && (
+          <a
+            href="#menu"
+            className="ml-1 press rounded-full px-4 py-2 text-[10px] tracking-editorial uppercase"
+            style={{ backgroundColor: "var(--terracotta)", color: "var(--ivory)" }}
+          >
+            {t("place_order")}
+          </a>
+        )}
       </div>
     </header>
   );

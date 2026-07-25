@@ -336,6 +336,8 @@ type StoreCtx = {
   products: Product[];
   orders: Order[];
   signature: SignatureOfDay;
+  orderingEnabled: boolean;
+  setOrderingEnabled: (v: boolean) => void;
   updateSignature: (patch: Partial<SignatureOfDay>) => void;
   updateProduct: (id: string, patch: Partial<Product>) => void;
   toggleSoldOut: (id: string) => void;
@@ -346,6 +348,19 @@ type StoreCtx = {
   advanceOrder: (id: string) => void;
   archiveOrder: (id: string) => void;
 };
+
+const LS_ORDERING = "boketto.ordering.enabled.v1";
+function loadOrderingEnabled(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return localStorage.getItem(LS_ORDERING) === "1";
+  } catch {
+    return false;
+  }
+}
+function saveOrderingEnabled(v: boolean) {
+  if (typeof window !== "undefined") localStorage.setItem(LS_ORDERING, v ? "1" : "0");
+}
 
 const LS_SIGNATURE = "boketto.signature.v1";
 const DEFAULT_SIGNATURE: SignatureOfDay = {
@@ -380,12 +395,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>(SEED_PRODUCTS);
   const [orders, setOrders] = useState<Order[]>([]);
   const [signature, setSignature] = useState<SignatureOfDay>(DEFAULT_SIGNATURE);
+  const [orderingEnabled, setOrderingEnabledState] = useState<boolean>(false);
 
   // hydrate from localStorage after mount (SSR-safe)
   useEffect(() => {
     setProducts(loadProducts());
     setOrders(loadOrders());
     setSignature(loadSignature());
+    setOrderingEnabledState(loadOrderingEnabled());
   }, []);
 
   // cross-tab sync via storage events + BroadcastChannel
@@ -396,11 +413,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       if (e.key === LS_PRODUCTS) setProducts(loadProducts());
       if (e.key === LS_ORDERS) setOrders(loadOrders());
       if (e.key === LS_SIGNATURE) setSignature(loadSignature());
+      if (e.key === LS_ORDERING) setOrderingEnabledState(loadOrderingEnabled());
     };
     const onMsg = (e: MessageEvent) => {
       if (e.data === "products") setProducts(loadProducts());
       if (e.data === "orders") setOrders(loadOrders());
       if (e.data === "signature") setSignature(loadSignature());
+      if (e.data === "ordering") setOrderingEnabledState(loadOrderingEnabled());
     };
     window.addEventListener("storage", onStorage);
     bc?.addEventListener("message", onMsg);
@@ -411,7 +430,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const broadcast = (kind: "products" | "orders" | "signature") => {
+  const broadcast = (kind: "products" | "orders" | "signature" | "ordering") => {
     if (typeof window === "undefined") return;
     if ("BroadcastChannel" in window) new BroadcastChannel("boketto").postMessage(kind);
   };
@@ -431,12 +450,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     saveSignature(next);
     broadcast("signature");
   };
+  const persistOrdering = (v: boolean) => {
+    setOrderingEnabledState(v);
+    saveOrderingEnabled(v);
+    broadcast("ordering");
+  };
 
   const value = useMemo<StoreCtx>(
     () => ({
       products,
       orders,
       signature,
+      orderingEnabled,
+      setOrderingEnabled: persistOrdering,
       updateSignature: (patch) => persistSignature({ ...signature, ...patch }),
       updateProduct: (id, patch) => {
         persistProducts(products.map((p) => (p.id === id ? { ...p, ...patch } : p)));
@@ -509,7 +535,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         );
       },
     }),
-    [products, orders, signature],
+    [products, orders, signature, orderingEnabled],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
