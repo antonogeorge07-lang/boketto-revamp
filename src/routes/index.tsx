@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
 type DraftLine = OrderLine;
 
 function PublicStorefront() {
-  const { products, createOrder } = useStore();
+  const { products, createOrder, orderingEnabled } = useStore();
   const [cat, setCat] = useState<Category>("bokematchas");
   const [drawerFor, setDrawerFor] = useState<Product | null>(null);
   const [cart, setCart] = useState<DraftLine[]>([]);
