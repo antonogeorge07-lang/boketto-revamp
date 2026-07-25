@@ -117,7 +117,7 @@ function PublicStorefront() {
 // ============================================================================
 // FLOATING GLASS NAV
 // ============================================================================
-function FloatingNav() {
+function FloatingNav({ orderingEnabled }: { orderingEnabled: boolean }) {
   const t = useT();
   return (
     <header className="fixed top-4 inset-x-4 z-40 flex justify-center pointer-events-none">
@@ -137,13 +137,15 @@ function FloatingNav() {
         </span>
         <span className="hidden sm:block h-4 w-px bg-[color:var(--ivory)]/25" />
         <LanguageSwitcher tone="dark" />
-        <a
-          href="#menu"
-          className="ml-1 press rounded-full px-4 py-2 text-[10px] tracking-editorial uppercase"
-          style={{ backgroundColor: "var(--terracotta)", color: "var(--ivory)" }}
-        >
-          {t("place_order")}
-        </a>
+        {orderingEnabled && (
+          <a
+            href="#menu"
+            className="ml-1 press rounded-full px-4 py-2 text-[10px] tracking-editorial uppercase"
+            style={{ backgroundColor: "var(--terracotta)", color: "var(--ivory)" }}
+          >
+            {t("place_order")}
+          </a>
+        )}
       </div>
     </header>
   );
