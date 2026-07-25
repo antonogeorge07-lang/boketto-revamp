@@ -41,6 +41,18 @@ function AdminPage() {
             </span>
           </div>
           <nav className="flex items-center gap-2">
+            <label className="glass press rounded-full flex items-center gap-2 px-3 py-1.5 cursor-pointer" title="Enable customer ordering on the public site">
+              <span className="text-[10px] tracking-editorial uppercase">Ordering</span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={orderingEnabled}
+                onClick={() => setOrderingEnabled(!orderingEnabled)}
+                className={`relative w-9 h-5 rounded-full transition-colors ${orderingEnabled ? "bg-[color:var(--gold)]" : "bg-foreground/20"}`}
+              >
+                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-background shadow-sm transition-all ${orderingEnabled ? "left-[18px]" : "left-0.5"}`} />
+              </button>
+            </label>
             <Link to="/kds" className="glass press rounded-full px-4 py-2 text-[10px] tracking-editorial uppercase">
               KDS
             </Link>
