@@ -336,6 +336,8 @@ type StoreCtx = {
   products: Product[];
   orders: Order[];
   signature: SignatureOfDay;
+  orderingEnabled: boolean;
+  setOrderingEnabled: (v: boolean) => void;
   updateSignature: (patch: Partial<SignatureOfDay>) => void;
   updateProduct: (id: string, patch: Partial<Product>) => void;
   toggleSoldOut: (id: string) => void;
@@ -346,6 +348,19 @@ type StoreCtx = {
   advanceOrder: (id: string) => void;
   archiveOrder: (id: string) => void;
 };
+
+const LS_ORDERING = "boketto.ordering.enabled.v1";
+function loadOrderingEnabled(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return localStorage.getItem(LS_ORDERING) === "1";
+  } catch {
+    return false;
+  }
+}
+function saveOrderingEnabled(v: boolean) {
+  if (typeof window !== "undefined") localStorage.setItem(LS_ORDERING, v ? "1" : "0");
+}
 
 const LS_SIGNATURE = "boketto.signature.v1";
 const DEFAULT_SIGNATURE: SignatureOfDay = {
