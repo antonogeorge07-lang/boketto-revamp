@@ -74,7 +74,7 @@ function PublicStorefront() {
 
       <Footer />
 
-      {drawerFor && (
+      {orderingEnabled && drawerFor && (
         <CustomizerDrawer
           product={drawerFor}
           onClose={() => setDrawerFor(null)}
@@ -82,7 +82,7 @@ function PublicStorefront() {
         />
       )}
 
-      {cartCount > 0 && !checkout && !confirmed && (
+      {orderingEnabled && cartCount > 0 && !checkout && !confirmed && (
         <CartDrawer
           open={cartOpen}
           setOpen={setCartOpen}
@@ -93,7 +93,7 @@ function PublicStorefront() {
         />
       )}
 
-      {checkout && (
+      {orderingEnabled && checkout && (
         <CheckoutSheet
           value={checkout}
           setValue={setCheckout}
@@ -103,7 +103,7 @@ function PublicStorefront() {
         />
       )}
 
-      {confirmed && (
+      {orderingEnabled && confirmed && (
         <ConfirmSheet
           ref_={confirmed.ref}
           name={confirmed.name}
