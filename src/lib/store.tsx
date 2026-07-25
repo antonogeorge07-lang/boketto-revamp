@@ -445,6 +445,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     saveOrders(next);
     broadcast("orders");
   };
+  const persistSignature = (next: SignatureOfDay) => {
+    setSignature(next);
+    saveSignature(next);
+    broadcast("signature");
+  };
   const persistOrdering = (v: boolean) => {
     setOrderingEnabledState(v);
     saveOrderingEnabled(v);
