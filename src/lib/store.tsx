@@ -535,7 +535,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         );
       },
     }),
-    [products, orders, signature],
+    [products, orders, signature, orderingEnabled],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
