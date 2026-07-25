@@ -58,15 +58,15 @@ function PublicStorefront() {
 
   return (
     <div className="min-h-screen text-foreground pb-40">
-      <FloatingNav />
+      <FloatingNav orderingEnabled={orderingEnabled} />
 
       <Hero />
 
-      <SpecialsCarousel items={specials} onOpen={(p) => setDrawerFor(p)} />
+      <SpecialsCarousel items={specials} onOpen={(p) => orderingEnabled && setDrawerFor(p)} />
 
-      <RegularsGrid items={regulars} onOpen={(p) => setDrawerFor(p)} />
+      <RegularsGrid items={regulars} onOpen={(p) => orderingEnabled && setDrawerFor(p)} />
 
-      <MenuSection cat={cat} setCat={setCat} items={catalog} onOpen={(p) => setDrawerFor(p)} />
+      <MenuSection cat={cat} setCat={setCat} items={catalog} onOpen={(p) => orderingEnabled && setDrawerFor(p)} />
 
       <GallerySection />
 
