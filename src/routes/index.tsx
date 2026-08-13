@@ -267,7 +267,7 @@ function SpecialsCarousel({ items, orderingEnabled, onOpen }: { items: Product[]
 // ============================================================================
 // REGULARS
 // ============================================================================
-function RegularsGrid({ items, onOpen }: { items: Product[]; onOpen: (p: Product) => void }) {
+function RegularsGrid({ items, orderingEnabled, onOpen }: { items: Product[]; orderingEnabled: boolean; onOpen: (p: Product) => void }) {
   const t = useT();
   const tp = useProductT();
   if (items.length === 0) return null;
@@ -281,25 +281,29 @@ function RegularsGrid({ items, onOpen }: { items: Product[]; onOpen: (p: Product
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          {items.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => !p.soldOut && onOpen(p)}
-              disabled={p.soldOut}
-              className={`glass shimmer press rounded-2xl p-4 text-left transition-transform hover:-translate-y-0.5 ${p.soldOut ? "opacity-40 blur-[1px] pointer-events-none" : ""}`}
-            >
-              {p.image && (
-                <div className="aspect-[4/3] rounded-xl mb-3 overflow-hidden">
-                  <img src={p.image} alt={tp.name(p)} className="w-full h-full object-cover" />
+          {items.map((p) => {
+            const clickable = orderingEnabled && !p.soldOut;
+            const Wrapper = clickable ? "button" : "div";
+            return (
+              <Wrapper
+                key={p.id}
+                onClick={clickable ? () => onOpen(p) : undefined}
+                disabled={clickable ? p.soldOut : undefined}
+                className={`glass rounded-2xl p-4 text-left ${p.soldOut ? "opacity-40 blur-[1px]" : ""} ${clickable ? "shimmer press transition-transform hover:-translate-y-0.5" : "pointer-events-none"}`}
+              >
+                {p.image && (
+                  <div className="aspect-[4/3] rounded-xl mb-3 overflow-hidden">
+                    <img src={p.image} alt={tp.name(p)} className="w-full h-full object-cover" />
+                  </div>
+                )}
+                <div className="flex items-center justify-between">
+                  <span className="font-serif text-base leading-tight">{tp.name(p)}</span>
+                  <span className="text-xs text-foreground/60">€{p.price.toFixed(2)}</span>
                 </div>
-              )}
-              <div className="flex items-center justify-between">
-                <span className="font-serif text-base leading-tight">{tp.name(p)}</span>
-                <span className="text-xs text-foreground/60">€{p.price.toFixed(2)}</span>
-              </div>
-              <p className="mt-1 text-[9px] tracking-editorial uppercase text-foreground/45 line-clamp-1">{tp.origin(p)}</p>
-            </button>
-          ))}
+                <p className="mt-1 text-[9px] tracking-editorial uppercase text-foreground/45 line-clamp-1">{tp.origin(p)}</p>
+              </Wrapper>
+            );
+          })}
         </div>
       </div>
     </section>
