@@ -314,9 +314,9 @@ function RegularsGrid({ items, orderingEnabled, onOpen }: { items: Product[]; or
 // MENU
 // ============================================================================
 function MenuSection({
-  cat, setCat, items, onOpen,
+  cat, setCat, items, orderingEnabled, onOpen,
 }: {
-  cat: Category; setCat: (c: Category) => void; items: Product[]; onOpen: (p: Product) => void;
+  cat: Category; setCat: (c: Category) => void; items: Product[]; orderingEnabled: boolean; onOpen: (p: Product) => void;
 }) {
   const t = useT();
   const tp = useProductT();
@@ -350,31 +350,35 @@ function MenuSection({
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4">
-          {items.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => !p.soldOut && onOpen(p)}
-              disabled={p.soldOut}
-              className={`glass shimmer press text-left rounded-3xl p-6 transition-all hover:-translate-y-0.5 ${p.soldOut ? "opacity-40 blur-[1px] pointer-events-none" : ""}`}
-            >
-              {p.image && (
-                <div className="aspect-[16/9] rounded-2xl mb-4 overflow-hidden">
-                  <img src={p.image} alt={tp.name(p)} className="w-full h-full object-cover" />
+          {items.map((p) => {
+            const clickable = orderingEnabled && !p.soldOut;
+            const Wrapper = clickable ? "button" : "div";
+            return (
+              <Wrapper
+                key={p.id}
+                onClick={clickable ? () => onOpen(p) : undefined}
+                disabled={clickable ? p.soldOut : undefined}
+                className={`glass text-left rounded-3xl p-6 ${p.soldOut ? "opacity-40 blur-[1px]" : ""} ${clickable ? "shimmer press transition-all hover:-translate-y-0.5" : "pointer-events-none"}`}
+              >
+                {p.image && (
+                  <div className="aspect-[16/9] rounded-2xl mb-4 overflow-hidden">
+                    <img src={p.image} alt={tp.name(p)} className="w-full h-full object-cover" />
+                  </div>
+                )}
+                <div className="flex items-baseline justify-between gap-4">
+                  <h3 className="font-serif text-xl leading-tight">{tp.name(p)}</h3>
+                  <span className="font-serif text-lg text-foreground/70">€{p.price.toFixed(2)}</span>
                 </div>
-              )}
-              <div className="flex items-baseline justify-between gap-4">
-                <h3 className="font-serif text-xl leading-tight">{tp.name(p)}</h3>
-                <span className="font-serif text-lg text-foreground/70">€{p.price.toFixed(2)}</span>
-              </div>
-              <p className="mt-1 text-[9px] tracking-editorial uppercase text-foreground/45">{tp.origin(p)}</p>
-              <p className="mt-3 text-sm text-foreground/65 leading-relaxed">{tp.desc(p)}</p>
-              {p.modifiers && p.modifiers.length > 0 && (
-                <p className="mt-3 text-[10px] tracking-editorial uppercase text-foreground/45">
-                  {p.modifiers.length} {p.modifiers.length > 1 ? t("options_label") : t("option_label")}
-                </p>
-              )}
-            </button>
-          ))}
+                <p className="mt-1 text-[9px] tracking-editorial uppercase text-foreground/45">{tp.origin(p)}</p>
+                <p className="mt-3 text-sm text-foreground/65 leading-relaxed">{tp.desc(p)}</p>
+                {p.modifiers && p.modifiers.length > 0 && (
+                  <p className="mt-3 text-[10px] tracking-editorial uppercase text-foreground/45">
+                    {p.modifiers.length} {p.modifiers.length > 1 ? t("options_label") : t("option_label")}
+                  </p>
+                )}
+              </Wrapper>
+            );
+          })}
         </div>
       </div>
     </section>
