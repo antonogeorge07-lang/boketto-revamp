@@ -269,8 +269,6 @@ export const CATEGORY_META: Record<Category, { label: string; sub: string }> = {
 
 const LS_PRODUCTS = "boketto.products.v2";
 const LS_ORDERS = "boketto.orders.v2";
-const LS_AUTH = "boketto.staff.session";
-const STAFF_PASSWORD = "boketto2026"; // client-side gate; documented to the owner
 
 function loadProducts(): Product[] {
   if (typeof window === "undefined") return SEED_PRODUCTS;
