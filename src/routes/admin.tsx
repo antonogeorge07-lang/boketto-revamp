@@ -2,10 +2,15 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import { Sparkles, UploadCloud, X, Link2, Link2Off } from "lucide-react";
 import { CATEGORY_META, useStaffAuth, useStore, type Category } from "../lib/store";
+import { StaffGate } from "@/components/StaffGate";
 
 
 export const Route = createFileRoute("/admin")({
-  component: AdminPage,
+  component: () => (
+    <StaffGate redirectTo="/admin">
+      <AdminPage />
+    </StaffGate>
+  ),
 });
 
 

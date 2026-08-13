@@ -1,4 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
 
 // ============================================================================
 // TYPES
@@ -269,8 +271,6 @@ export const CATEGORY_META: Record<Category, { label: string; sub: string }> = {
 
 const LS_PRODUCTS = "boketto.products.v2";
 const LS_ORDERS = "boketto.orders.v2";
-const LS_AUTH = "boketto.staff.session";
-const STAFF_PASSWORD = "boketto2026"; // client-side gate; documented to the owner
 
 function loadProducts(): Product[] {
   if (typeof window === "undefined") return SEED_PRODUCTS;
@@ -548,30 +548,57 @@ export function useStore() {
 }
 
 // ============================================================================
-// AUTH (client-side staff gate)
+// AUTH (real Supabase session + server-verified staff role)
 // ============================================================================
 
 export function useStaffAuth() {
   const [authed, setAuthed] = useState(false);
+  const [isStaff, setIsStaff] = useState(false);
   const [ready, setReady] = useState(false);
+
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    setAuthed(sessionStorage.getItem(LS_AUTH) === "1");
-    setReady(true);
-  }, []);
-  const signIn = (password: string) => {
-    if (password === STAFF_PASSWORD) {
-      sessionStorage.setItem(LS_AUTH, "1");
+    let active = true;
+
+    const resolve = async (hasSession: boolean) => {
+      if (!hasSession) {
+        if (!active) return;
+        setAuthed(false);
+        setIsStaff(false);
+        setReady(true);
+        return;
+      }
+      let staff = false;
+      try {
+        const { getStaffStatus } = await import("./staff.functions");
+        const status = await getStaffStatus();
+        staff = status.isStaff;
+      } catch {
+        staff = false;
+      }
+      if (!active) return;
       setAuthed(true);
-      return true;
-    }
-    return false;
-  };
-  const signOut = () => {
-    sessionStorage.removeItem(LS_AUTH);
+      setIsStaff(staff);
+      setReady(true);
+    };
+
+    supabase.auth.getSession().then(({ data }) => resolve(Boolean(data.session)));
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setReady(false);
+      void resolve(Boolean(session));
+    });
+
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
     setAuthed(false);
+    setIsStaff(false);
   };
-  return { authed, ready, signIn, signOut };
+
+  return { authed, isStaff, ready, signOut };
 }
 
-export const STAFF_HINT = "Staff access: password is boketto2026";

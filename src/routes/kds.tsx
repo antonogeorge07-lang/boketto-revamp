@@ -1,9 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useStaffAuth, useStore, type Order, type OrderStatus } from "../lib/store";
+import { StaffGate } from "@/components/StaffGate";
 
 export const Route = createFileRoute("/kds")({
-  component: KdsPage,
+  component: () => (
+    <StaffGate redirectTo="/kds">
+      <KdsPage />
+    </StaffGate>
+  ),
 });
 
 
