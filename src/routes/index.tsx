@@ -206,7 +206,7 @@ function Hero() {
 // ============================================================================
 // TODAY'S SPECIALS CAROUSEL
 // ============================================================================
-function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Product) => void }) {
+function SpecialsCarousel({ items, orderingEnabled, onOpen }: { items: Product[]; orderingEnabled: boolean; onOpen: (p: Product) => void }) {
   const t = useT();
   const tp = useProductT();
   if (items.length === 0) return null;
@@ -223,36 +223,40 @@ function SpecialsCarousel({ items, onOpen }: { items: Product[]; onOpen: (p: Pro
 
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {items.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => !p.soldOut && onOpen(p)}
-              disabled={p.soldOut}
-              className={`text-left group ${p.soldOut ? "opacity-40 blur-[1px] pointer-events-none" : ""}`}
-            >
-              <div className="glass-strong shimmer press rounded-[28px] p-6 h-full transition-transform group-hover:-translate-y-1">
-                <div className="aspect-[4/3] rounded-2xl mb-5 relative overflow-hidden"
-                  style={{ background: "linear-gradient(135deg, color-mix(in oklab, var(--gold) 25%, transparent), color-mix(in oklab, var(--forest) 30%, transparent))" }}>
-                  {p.image ? (
-                    <img src={p.image} alt={tp.name(p)} className="absolute inset-0 w-full h-full object-cover" />
-                  ) : (
-                    <div className="absolute inset-0 opacity-40" style={{
-                      backgroundImage: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), transparent 45%)"
-                    }} />
-                  )}
-                  <span className="absolute top-3 left-3 text-[9px] tracking-editorial uppercase glass rounded-full px-2.5 py-1">
-                    {t("signature_badge")}
-                  </span>
+          {items.map((p) => {
+            const clickable = orderingEnabled && !p.soldOut;
+            const Wrapper = clickable ? "button" : "div";
+            return (
+              <Wrapper
+                key={p.id}
+                onClick={clickable ? () => onOpen(p) : undefined}
+                disabled={clickable ? p.soldOut : undefined}
+                className={`text-left group ${p.soldOut ? "opacity-40 blur-[1px]" : ""} ${clickable ? "" : "pointer-events-none"}`}
+              >
+                <div className={`glass-strong rounded-[28px] p-6 h-full ${clickable ? "shimmer press transition-transform group-hover:-translate-y-1" : ""}`}>
+                  <div className="aspect-[4/3] rounded-2xl mb-5 relative overflow-hidden"
+                    style={{ background: "linear-gradient(135deg, color-mix(in oklab, var(--gold) 25%, transparent), color-mix(in oklab, var(--forest) 30%, transparent))" }}>
+                    {p.image ? (
+                      <img src={p.image} alt={tp.name(p)} className="absolute inset-0 w-full h-full object-cover" />
+                    ) : (
+                      <div className="absolute inset-0 opacity-40" style={{
+                        backgroundImage: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), transparent 45%)"
+                      }} />
+                    )}
+                    <span className="absolute top-3 left-3 text-[9px] tracking-editorial uppercase glass rounded-full px-2.5 py-1">
+                      {t("signature_badge")}
+                    </span>
+                  </div>
+                  <div className="flex items-baseline justify-between gap-4">
+                    <h3 className="font-serif text-2xl leading-tight">{tp.name(p)}</h3>
+                    <span className="font-serif text-xl text-foreground/70">€{p.price.toFixed(2)}</span>
+                  </div>
+                  <p className="mt-1 text-[10px] tracking-editorial uppercase text-foreground/50">{tp.origin(p)}</p>
+                  <p className="mt-3 text-sm text-foreground/70 leading-relaxed line-clamp-3">{tp.desc(p)}</p>
                 </div>
-                <div className="flex items-baseline justify-between gap-4">
-                  <h3 className="font-serif text-2xl leading-tight">{tp.name(p)}</h3>
-                  <span className="font-serif text-xl text-foreground/70">€{p.price.toFixed(2)}</span>
-                </div>
-                <p className="mt-1 text-[10px] tracking-editorial uppercase text-foreground/50">{tp.origin(p)}</p>
-                <p className="mt-3 text-sm text-foreground/70 leading-relaxed line-clamp-3">{tp.desc(p)}</p>
-              </div>
-            </button>
-          ))}
+              </Wrapper>
+            );
+          })}
         </div>
 
       </div>
