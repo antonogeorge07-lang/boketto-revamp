@@ -582,10 +582,19 @@ export function useStaffAuth() {
       setReady(true);
     };
 
-    supabase.auth.getSession().then(({ data }) => resolve(Boolean(data.session)));
+    supabase.auth.getSession().then(({ data }) => {
+      hadSession = Boolean(data.session);
+      void resolve(hadSession);
+    });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      const has = Boolean(session);
+      // Only re-verify on real sign-in/sign-out transitions. TOKEN_REFRESHED,
+      // USER_UPDATED and INITIAL_SESSION keep the same session, so resetting
+      // `ready` would blank the staff screens mid-task.
+      if (hadSession === null || has === hadSession) return;
+      hadSession = has;
       setReady(false);
-      void resolve(Boolean(session));
+      void resolve(has);
     });
 
     return () => {
