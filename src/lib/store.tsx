@@ -558,6 +558,7 @@ export function useStaffAuth() {
 
   useEffect(() => {
     let active = true;
+    let hadSession: boolean | null = null;
 
     const resolve = async (hasSession: boolean) => {
       if (!hasSession) {
